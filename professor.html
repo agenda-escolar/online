@@ -1,24 +1,94 @@
-<!DOCTYPE html> 
-<html lang="pt-BR"> 
-<head> 
-  <meta charset="UTF-8"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-  <title>Professor</title> 
-  <link rel="stylesheet" href="./css/style.css"> 
-  <style> 
-    body { 
-      background-color: aquamarine; 
-    } 
-  </style> 
-</head> 
-<body> 
-  <!-- Section 1: Header --> 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professor</title>
+  <link rel="stylesheet" href="./css/style.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body { background-color: aquamarine; }
+    .info-professor span.nome { font-size: 22pt; display: block;color:green }
+    .info-professor span.disciplinas { font-size: 10pt; }
+    .alert {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      text-align: center;
+      z-index: 1000;
+    }
+    .alert button {
+      margin-top: 10px;
+      padding: 5px 10px;
+    }
+
+
+    .tarefa-preview {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #f0f0f0;
+}
+
+.tarefa-preview > div {
+  margin: 5px;
+}
+
+.tarefa-preview strong {
+  color: black;
+  display: block;
+  font-size: 8pt;
+}
+
+.info-pre, .info-observ-pre {
+  background-color: aquamarine;
+  color: rgb(4, 62, 22);
+  font-size: 8pt;
+  border: 1px solid black;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.info-pre {
+  width: 70px;
+}
+
+.info-observ-pre {
+  width: 200px;
+}
+
+.btns-ed-ex {
+  display: flex;
+  gap: 5px;
+}
+
+.botao-pre {
+  width: 50px;
+  height: 30px;
+  font-size: 8pt;
+ 
+}
+  </style>
+</head>
+<body>
+ <!-- Section 1: Header --> 
   <header> 
-    <div class="logo">LOGO</div> 
-    <div class="info-professor"> 
-      <span>Nome Professor | Disciplina</span> 
+    <div class="logo"> 
+      <img src="./img/logo.png" alt="" class="logo-img"> 
     </div> 
-    <button>Sair</button> 
+    <div class="info-professor"> 
+      <span id="nome-professor" class="nome"></span> 
+      <span id="disciplinas-professor" class="disciplinas"></span> 
+    </div> 
+    <button id="logout-button">Sair</button> 
   </header> 
   <!-- Section 2: Agendamento Tarefas --> 
   <section class="agendamento"> 
@@ -28,104 +98,312 @@
         <div class="col"> 
           <div> 
             <label>Data:</label> 
-            <input type="date" id="data-agendamento" class="form-control" style="width: 50%;"> 
+            <input type="date" id="data-agendamento" class="form-control" style="width: 50%;" required> 
           </div> 
           <div> 
             <label>Disciplina:</label> 
-            <select> 
-              <option value="">Historia</option> 
-              <option value="">Geografia</option> 
-              <option value="">Gramatica</option> 
-              <option value="">Matematica</option> 
-              <option value="">Inglês</option> 
-              <option value="">Redação</option> 
-              <option value="">Artes</option> 
+            <select id="disciplina-select" name="disciplina" required> 
+              <!-- disciplinas serão preenchidas pelo JS --> 
             </select> 
           </div> 
           <div> 
             <label>Turno:</label> 
-            <select> 
-              <option value="">Manhã</option> 
-              <option value="">Tarde</option> 
+            <select name="turno"> 
+              <option value="Manhã">Manhã</option> 
+              <option value="Tarde">Tarde</option> 
             </select> 
           </div> 
           <div> 
             <label>Livro:</label> 
-            <input type="text"> 
+            <input type="text" name="livro" required> 
           </div> 
         </div> 
         <div class="col"> 
           <div> 
             <label>Série:</label> 
-            <select> 
-              <option value="">jardim I</option> 
-              <option value="">jardim II</option> 
-              <option value="">jardim III</option> 
-              <option value="">jardim IV</option> 
-              <option value="">jardim V</option> 
-              <option value="">1ª série</option> 
-              <option value="">2ª série</option> 
-              <option value="">3ª série</option> 
-              <option value="">4ª série</option> 
-              <option value="">5ª série</option> 
-              <option value="">6ª série</option> 
-              <option value="">7ª série</option> 
-              <option value="">8ª série</option> 
-              <option value="">9ª ano</option> 
-              <option value="">1ª ano</option> 
-              <option value="">2ª ano</option> 
+            <select name="serie"> 
+              <option value="jardim I">jardim I</option> 
+              <option value="jardim II">jardim II</option> 
+              <option value="jardim III">jardim III</option> 
+              <option value="jardim IV">jardim IV</option> 
+              <option value="jardim V">jardim V</option> 
+              <option value="1ª série">1ª série</option> 
+              <option value="2ª série">2ª série</option> 
+              <option value="3ª série">3ª série</option> 
+              <option value="4ª série">4ª série</option> 
+              <option value="5ª série">5ª série</option> 
+              <option value="6ª série">6ª série</option> 
+              <option value="7ª série">7ª série</option> 
+              <option value="8ª série">8ª série</option> 
+              <option value="9ª ano">9ª ano</option> 
+              <option value="1ª ano">1ª ano</option> 
+              <option value="2ª ano">2ª ano</option> 
             </select> 
           </div> 
           <div> 
             <label>Turma:</label> 
-            <select> 
-              <option value="">turma A</option> 
-              <option value="">turma B</option> 
-              <option value="">turma C</option> 
+            <select name="turma"> 
+              <option value="turma A">turma A</option> 
+              <option value="turma B">turma B</option> 
+              <option value="turma C">turma C</option> 
             </select> 
           </div> 
           <div> 
             <label>Observação:</label> 
-            <textarea></textarea> 
+            <textarea name="observacao"></textarea> 
           </div> 
           <div class="inline-row" style="position: relative;"> 
             <button id="btn-tarefa-impressa" type="button">Tarefa Impressa</button> 
-           <div id="opcoes-impressa" style="display: none; position: absolute; top:0px;width: 100px; left: 125px; padding:0px; border: 0px solid #ddd;height: 30px;">
-
-                <input type="checkbox" name="impressa" value="sim"> &nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sim 
-              </label> 
+            <div id="opcoes-impressa" style="display: none; position: absolute; top:0px;width: 100px; left: 125px; padding:0px; border: 0px solid #ddd;height: 30px;"> 
+              <input type="checkbox" id="impressa" name="impressa" value="sim"> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sim </label> 
             </div> 
           </div> 
         </div> 
       </div> 
       <div class="botoes"> 
-        <button>Salvar</button> 
-        <button>Limpar</button> 
+        <button type="submit">Salvar</button> 
+        <button type="reset">Limpar</button> 
         <button>Histórico</button> 
       </div> 
     </form> 
   </section> 
   <!-- Section 3: Resumo --> 
   <section class="resumo"> 
-    <div id="resumo-container"></div> 
-    <button>Editar</button> 
-    <button>Excluir</button> 
+    <h2>Pré-visualização da Tarefa</h2> 
+    <div id="tarefa-preview"></div> 
   </section> 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
-  <script>
-    $(document).ready(function() {
-      $('#btn-tarefa-impressa').click(function() {
-        $('#opcoes-impressa').toggle();
-      });
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc, collection, addDoc, query, where, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-      $(document).click(function(e) {
-        if (!$(e.target).closest('#btn-tarefa-impressa, #opcoes-impressa').length) {
-          $('#opcoes-impressa').hide();
-        }
-      });
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJnKktnaupmHUwL-jZHIeionowOb6Egrg",
+    authDomain: "agenda-escolar-19fda.firebaseapp.com",
+    projectId: "agenda-escolar-19fda",
+    storageBucket: "agenda-escolar-19fda.firebasestorage.app",
+    messagingSenderId: "460998217684",
+    appId: "1:460998217684:web:98e4a2cc23b467124bd041",
+    measurementId: "G-RL4NVD2Y1C"
+  };
+
+  initializeApp(firebaseConfig);
+  const auth = getAuth();
+  const db = getFirestore();
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const docRef = doc(db, "professores", user.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.getElementById('nome-professor').textContent = data.nome;
+        document.getElementById('disciplinas-professor').textContent = data.disciplinas.join(', ');
+        const select = document.getElementById('disciplina-select');
+        data.disciplinas.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d;
+          opt.textContent = d;
+          select.appendChild(opt);
+        });
+      }
+    } else {
+      window.location.href = 'index.html';
+    }
+  });
+
+  document.getElementById('logout-button').addEventListener('click', () => {
+    signOut(auth).then(() => {
+      window.location.href = 'index.html';
+    }).catch((error) => {
+      console.error('Erro ao sair:', error);
     });
-  </script> 
-</body> 
-</html>
+  });
 
+  document.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = document.querySelector('input[type="date"]').value;
+    const disciplina = document.getElementById('disciplina-select').value;
+    const turno = document.querySelector('select[name="turno"]').value;
+    const livro = document.querySelector('input[name="livro"]').value;
+    const serie = document.querySelector('select[name="serie"]').value;
+    const turma = document.querySelector('select[name="turma"]').value;
+    const observacao = document.querySelector('textarea[name="observacao"]').value;
+    const impressa = document.querySelector('input[name="impressa"]').checked ? 'Sim' : 'Não';
+    const tarefa = {
+      data,
+      disciplina,
+      turno,
+      livro,
+      serie,
+      turma,
+      observacao,
+      impressa,
+      professor: auth.currentUser.uid,
+      criadoEm: new Date()
+    };
+    try {
+      const docRef = await addDoc(collection(db, 'tarefas'), tarefa);
+      mostraPreview(tarefa, docRef.id);
+      showAlert('✅ Tarefa agendada com sucesso!');
+      document.querySelector('form').reset();
+    } catch (error) {
+      console.error('Erro:', error);
+      showAlert('❌ Erro ao agendar tarefa');
+    }
+  });
+
+  async function editarTarefa(id) {
+    console.log('Editar tarefa chamado com id:', id);
+    try {
+      const tarefaRef = doc(db, 'tarefas', id);
+      const docSnap = await getDoc(tarefaRef);
+      if (docSnap.exists()) {
+        const tarefa = docSnap.data();
+      
+        document.querySelector('input[type="date"]').value = tarefa.data;
+        document.getElementById('disciplina-select').value = tarefa.disciplina;
+        document.querySelector('select[name="turno"]').value = tarefa.turno;
+        document.querySelector('input[name="livro"]').value = tarefa.livro;
+        document.querySelector('select[name="serie"]').value = tarefa.serie;
+        document.querySelector('select[name="turma"]').value = tarefa.turma;
+        document.querySelector('textarea[name="observacao"]').value = tarefa.observacao;
+        document.querySelector('input[name="impressa"]').checked = tarefa.impressa === 'Sim';
+        document.querySelector('form').onsubmit = async (e) => {
+          e.preventDefault();
+          const updatedTarefa = {
+            data: document.querySelector('input[type="date"]').value,
+            disciplina: document.getElementById('disciplina-select').value,
+            turno: document.querySelector('select[name="turno"]').value,
+            livro: document.querySelector('input[name="livro"]').value,
+            serie: document.querySelector('select[name="serie"]').value,
+            turma: document.querySelector('select[name="turma"]').value,
+            observacao: document.querySelector('textarea[name="observacao"]').value,
+            impressa: document.querySelector('input[name="impressa"]').checked ? 'Sim' : 'Não',
+          };
+          try {
+            await updateDoc(tarefaRef, updatedTarefa);
+            mostraPreview(updatedTarefa, id);
+            showAlert('✅ Tarefa atualizada com sucesso!');
+            document.querySelector('form').reset();
+            document.querySelector('form').onsubmit = null;
+          } catch (error) {
+            console.error('Erro:', error);
+            showAlert('❌ Erro ao atualizar tarefa');
+          }
+        };
+      } else {
+        showAlert('❌ Tarefa não encontrada');
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      showAlert('❌ Erro ao carregar tarefa');
+    }
+  }
+
+ function showConfirmModal(id) {
+  const modal = document.createElement('div');
+  modal.className = 'alert';
+  modal.innerHTML = `
+    <p>Tem certeza que deseja excluir esta tarefa?</p>
+    <button id="confirmYes">Sim</button>
+    <button id="confirmNo">Não</button>
+  `;
+  document.body.appendChild(modal);
+  document.getElementById('confirmYes').addEventListener('click', () => {
+    excluirTarefaConfirm(id);
+    modal.remove();
+  });
+  document.getElementById('confirmNo').addEventListener('click', () => {
+    modal.remove();
+  });
+}
+
+async function excluirTarefaConfirm(id) {
+  try {
+    const tarefaRef = doc(db, 'tarefas', id);
+    await deleteDoc(tarefaRef);
+    document.getElementById('tarefa-preview').innerHTML = '';
+    showAlert('✅ Tarefa excluída com sucesso!');
+  } catch (error) {
+    console.error('Erro ao excluir:', error);
+    showAlert('❌ Erro ao excluir tarefa');
+  }
+}
+
+async function excluirTarefa(id) {
+  showConfirmModal(id);
+}
+
+  function mostraPreview(tarefa, id) {
+    
+    const preview = `
+     <div class="tarefa-preview">
+  <div>
+    <strong>Data</strong>
+    <div class='info-pre'>${tarefa.data}</div>
+  </div>
+  <div>
+    <strong>Disciplina</strong>
+    <div class='info-pre'>${tarefa.disciplina}</div>
+  </div>
+  <div>
+    <strong>Turno</strong>
+    <div class='info-pre'>${tarefa.turno}</div>
+  </div>
+  <div>
+    <strong>Livro</strong>
+    <div class='info-observ-pre'>${tarefa.livro}</div>
+  </div>
+  <div>
+    <strong>Série</strong>
+    <div class='info-pre'>${tarefa.serie}</div>
+  </div>
+  <div>
+    <strong>Turma</strong>
+    <div class='info-pre'>${tarefa.turma}</div>
+  </div>
+  <div>
+    <strong>Observação</strong>
+    <div class='info-observ-pre'>${tarefa.observacao || 'Sem observações'}</div>
+  </div>
+  <div>
+    <strong>Tarefa impressa</strong>
+    <div class='info-pre'>${tarefa.impressa}</div>
+  </div>
+ <div class="btns-ed-ex">
+  <button onclick="editarTarefa('${id}')" class="botao-pre"><i class="fas fa-pencil-alt"></i></button>
+  <button onclick="excluirTarefa('${id}')" class="botao-pre"><i class="fas fa-trash"></i></button>
+</div>
+</div>
+    `;
+    document.getElementById('tarefa-preview').innerHTML = preview;
+  }
+
+  function showAlert(msg) {
+    const div = document.createElement('div');
+    div.className = 'alert';
+    div.innerHTML = `
+      <p>${msg}</p>
+      <button onclick="this.parentNode.remove()">OK</button>
+    `;
+    document.body.appendChild(div);
+  }
+
+  window.editarTarefa = editarTarefa;
+  window.excluirTarefa = excluirTarefa;
+
+  $(document).ready(function() {
+    $('#btn-tarefa-impressa').click(function() {
+      $('#opcoes-impressa').toggle();
+    });
+    $(document).click(function(e) {
+      if (!$(e.target).closest('#btn-tarefa-impressa, #opcoes-impressa').length) {
+        $('#opcoes-impressa').hide();
+      }
+    });
+  });
+</script>
+</body>
+</html>

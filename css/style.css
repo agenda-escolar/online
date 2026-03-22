@@ -29,6 +29,13 @@ p {
   margin-top: 10px;
 }
 
+#logout-button{
+ padding: 10px;
+background-color: #63e89f;
+border-style: none;
+
+}
+
 .logo {
   border: 0px solid black;
   height: 100px;
@@ -135,6 +142,8 @@ header {
 
 .info-professor {
   text-align: center;
+  border: 0px solid black;
+  margin-right: 10px;
 }
 
 .agendamento h2 {
@@ -398,5 +407,67 @@ header {
 @media (min-width: 768px) {
   .aluno-container {
     max-width: 600px;
+  }
+}
+
+
+/*ajueste botoes pagina professor sessao previsualização*/
+.botao-pre {
+  width: 50px;
+  height: 30px;
+  font-size: 8pt;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 10px;
+}
+
+.botao-pre:nth-child(1) {
+  background-color: rgb(4, 62, 22);
+}
+
+.botao-pre:nth-child(2) {
+  background-color: red;
+}
+
+@media (max-width: 600px) {
+  .btns-ed-ex {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top:10px;
+    width: 100%;
+  }
+  .botao-pre {
+    width: auto;
+    height: 50px;
+    font-size: 12pt;
+    margin: 5px 0;
+    border: none;
+    border-radius: 8px;
+  }
+  .botao-pre:nth-child(1) {
+    background-color: #318831; /* verde claro */
+  }
+  .botao-pre:nth-child(2) {
+    background-color: #e07687; /* vermelho clarinho */
+  }
+}
+
+@media (min-width: 601px) {
+  .botao-pre {
+    width: 50px;
+    height: 30px;
+    font-size: 8pt;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .tarefa-preview > div {
+    margin: 2px;
+  }
+  .info-pre, .info-observ-pre {
+    padding: 3px;
   }
 }

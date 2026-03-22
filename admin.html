@@ -5,65 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Super Usuário</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: aquamarine;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .login-container {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 300px;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #45a049;
-    }
-    .esqueci-senha {
-      text-align: right;
-      font-size: 12px;
-      margin-top: 8px;
-    }
-    .esqueci-senha a {
-      color: #4CAF50;
-      text-decoration: none;
-    }
+    body { font-family: Arial, sans-serif; background-color: aquamarine; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .login-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
+    input { width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
+    button { width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #45a049; }
+    .esqueci-senha { text-align: right; font-size: 12px; margin-top: 8px; }
+    .esqueci-senha a { color: #4CAF50; text-decoration: none; }
+    #login-message { margin-top: 10px; text-align: center; }
   </style>
 </head>
 <body>
   <div class="login-container">
     <h2>Login Super Usuário</h2>
-    <form>
+    <form id="login-form">
       <label>Usuário:</label>
-      <input type="text" name="usuario">
+      <input type="text" id="email" required>
       <label>Senha:</label>
-      <input type="password" name="senha">
-      <button type="submit">Entrar</button>
+      <input type="password" id="password" required>
+      <button type="submit" id="login-button">Entrar</button>
+      <div id="login-message"></div>
     </form>
     <div class="esqueci-senha">
       <a href="#">Esqueci a senha</a>
     </div>
   </div>
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJnKktnaupmHUwL-jZHIeionowOb6Egrg",
+    authDomain: "agenda-escolar-19fda.firebaseapp.com",
+    projectId: "agenda-escolar-19fda",
+    storageBucket: "agenda-escolar-19fda.firebasestorage.app",
+    messagingSenderId: "460998217684",
+    appId: "1:460998217684:web:98e4a2cc23b467124bd041",
+    measurementId: "G-RL4NVD2Y1C"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
+
+  document.getElementById('login-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const messageDiv = document.getElementById('login-message');
+
+    
+    signInWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    messageDiv.style.color = 'green';
+    messageDiv.textContent = 'Logado com sucesso!';
+    window.location.href = 'cad_aluno_prof.html';
+  })
+  .catch((error) => {
+    messageDiv.style.color = 'red';
+    messageDiv.textContent = 'Usuario ou senha Incorreto';
+  });
+  });
+</script>
+
 </body>
 </html>
-

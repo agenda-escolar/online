@@ -6,15 +6,29 @@
   <title>Agenda Escolar</title>
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
-<style>
-  body {
-  background-color: rgb(3, 54, 24);
-}
-</style>
+  <style>
+    body { background-color: rgb(3, 54, 24); }
+    .alert {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      text-align: center;
+      z-index: 1000;
+    }
+    .alert button {
+      margin-top: 10px;
+      padding: 5px 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="geral">
-    <div class="logo"><img src="./img/logo0.png" alt="" class="logo-img"></div>
+    <div class="logo"><img src="./img/logo.png" alt="" class="logo-img"></div>
     <div class="titulo">
       <h1>Instituto Educacional Marito Dutra</h1>
       <p><b>AGENDA ESCOLAR 2026</b></p>
@@ -22,29 +36,65 @@
     <div class="area-aluno" onclick="abrirModal('aluno')"><img src="./img/aluna.png" alt="area do aluno" class="logo-aluno-professor"></div><hr/>
     <div class="area-professor" onclick="abrirModal('professor')"><img src="./img/professor.png" alt="area do professor" class="logo-aluno-professor"></div>
   </div>
-
   <!-- Modais -->
- <div id="modal-aluno" class="modal">
-  <form>
-    <h2>Login Aluno</h2>
-    <input type="text" placeholder="Matrícula">
-    <input type="password" placeholder="Senha">
-    <button type="submit">Entrar</button>
-    <button type="button" onclick="fecharModal('aluno')">Fechar</button>
-  </form>
-</div>
-<div id="modal-professor" class="modal">
-  <form>
-    <h2>Login Professor</h2>
-    <input type="text" placeholder="ID Professor">
-    <input type="password" placeholder="Senha">
-    <button type="submit">Entrar</button>
-    <button type="button" onclick="fecharModal('professor')">Fechar</button>
-  </form>
-</div>
-
-  
-
+  <div id="modal-aluno" class="modal">
+    <form>
+      <h2>Login Aluno</h2>
+      <input type="text" placeholder="Matrícula">
+      <input type="password" placeholder="Senha">
+      <button type="submit">Entrar</button>
+      <button type="button" onclick="fecharModal('aluno')">Fechar</button>
+    </form>
+  </div>
+  <div id="modal-professor" class="modal">
+    <form id="professor-login-form">
+      <h2>Login Professor</h2>
+      <input type="email" name="email" placeholder="Email">
+      <input type="password" name="senha" placeholder="Senha">
+      <button type="submit">Entrar</button>
+      <button type="button" onclick="fecharModal('professor')">Fechar</button>
+    </form>
+  </div>
   <script src="js/script.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJnKktnaupmHUwL-jZHIeionowOb6Egrg",
+      authDomain: "agenda-escolar-19fda.firebaseapp.com",
+      projectId: "agenda-escolar-19fda",
+      storageBucket: "agenda-escolar-19fda.firebasestorage.app",
+      messagingSenderId: "460998217684",
+      appId: "1:460998217684:web:98e4a2cc23b467124bd041",
+      measurementId: "G-RL4NVD2Y1C"
+    };
+    initializeApp(firebaseConfig);
+    const auth = getAuth();
+
+    document.getElementById('professor-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.querySelector('input[name="email"]').value;
+      const senha = document.querySelector('input[name="senha"]').value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, senha);
+        window.location.href = 'professor.html';
+      } catch (error) {
+        console.error('Erro:', error);
+        showAlert('❌ Email ou senha inválidos');
+      }
+    });
+
+    function showAlert(msg) {
+      const div = document.createElement('div');
+      div.className = 'alert';
+      div.innerHTML = `
+        <p>${msg}</p>
+        <button onclick="this.parentNode.remove()">OK</button>
+      `;
+      document.body.appendChild(div);
+    }
+  </script>
 </body>
 </html>
