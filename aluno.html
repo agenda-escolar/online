@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Aluno - Marito Dutra</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+body{background:#d4f4e2;font-family:'Poppins',sans-serif;padding-bottom:90px}
+.header-aluno{background:linear-gradient(135deg,#1a5c3a 0%,#2E865F 100%);padding:22px 15px 18px;width:100%}
+.perfil-container{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:18px;width:100%}
+.foto-aluno{width:88px;height:88px;border-radius:50%;border:4px solid #fff;object-fit:cover;flex-shrink:0;background:#ccc}
+.info-aluno{flex:1;color:#fff;min-width:0;overflow:hidden}
+.nome-aluno{font-size:clamp(16px,4.5vw,23px);font-weight:700;text-transform:uppercase;line-height:1.1;word-break:break-word}
+.detalhes-aluno{font-size:12px;opacity:.95;display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.menu-desktop{background:#fff;max-width:1100px;margin:-10px auto 18px;border-radius:12px;box-shadow:0 3px 12px rgba(0,0,0,.1);display:flex;justify-content:space-around;padding:14px;width:calc(100% - 24px)}
+.menu-desktop button{background:none;border:none;font-family:'Poppins';font-size:14px;font-weight:600;color:#1a5c3a;cursor:pointer;display:flex;align-items:center;gap:7px;position:relative;padding:8px 14px;border-radius:8px}
+.alerta-prova{position:absolute;top:-8px;right:-8px;min-width:18px;height:18px;background:#dc2626;border-radius:10px;border:2px solid #fff;color:#fff;font-size:11px;font-weight:bold;display:flex;align-items:center;justify-content:center;animation:pulse-vermelho 1.5s infinite;z-index:10}
+@keyframes pulse-vermelho{0%{box-shadow:0 0 0 0 rgba(220,38,38,.7)}70%{box-shadow:0 0 0 10px rgba(220,38,38,0)}100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}}
+.container-tarefas{max-width:1100px;margin:0 auto;padding:0 12px;width:100%}
+.titulo-secao{background:#6b9b6b;color:#fff;text-align:center;padding:13px;border-radius:10px;font-weight:700;margin-bottom:10px}
+.grid-tarefas{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px}
+.tf-card{background:#fff;border-radius:20px;padding:10px;display:flex;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.08);border:1px solid #eef5ef;width:100%;min-width:0}
+.tf-esq{width:95px;min-width:95px;border-radius:14px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;text-align:center;flex-shrink:0}
+.tf-esq h3{font-size:7.5px;font-weight:800;line-height:1.1;word-break:break-word;text-transform:uppercase;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;max-width:85px}
+.tf-esq-ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:18px;margin-bottom:8px}
+.tf-esq span{font-size:7.5px;margin-top:5px;font-weight:600;text-transform:uppercase;opacity:.7}
+.tf-dir{flex:1;padding:5px 4px;min-width:0}.tf-tit{font-size:13px;font-weight:800;color:#2e2a5a;margin-bottom:10px}
+.tf-item{display:flex;gap:10px;margin-bottom:12px;align-items:center}
+.tf-ic{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:12px;flex-shrink:0;background:#eef2ee;color:#2e2a5a}
+.tf-tx label{font-size:7px;color:#7a7ab0;text-transform:uppercase;font-weight:600;display:block;margin-bottom:1px}
+.tf-tx p{font-size:11px;font-weight:700;color:#2e2a5a;word-break:break-word}
+.loading-tarefas,.sem-tarefas{text-align:center;padding:35px 16px;background:#fff;border-radius:16px;color:#666;grid-column:1/-1;border:1px dashed #b9d4c0}
+.barra-caderno{background:#fff;border:2px solid #1a5c3a;border-radius:12px;padding:10px 16px;display:none;justify-content:space-between;align-items:center;margin-bottom:12px;width:100%;gap:16px}
+.barra-caderno.show{display:flex}.bc-lado{display:flex;align-items:center;gap:8px;flex:1}.bc-lado:last-child{justify-content:flex-end}
+.bc-top{display:flex;align-items:center;gap:6px;white-space:nowrap}.bc-top strong{font-size:10px;color:#1a5c3a;text-transform:uppercase}
+.pill{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800;display:inline-flex;justify-content:center}
+.pill-sim{background:#d1f0d8;color:#166534;border:1px solid #a8d8b0}.pill-nao{background:#ffe0e0;color:#b91c1c;border:1px solid #ffb4b4}
+.menu-mobile{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;box-shadow:0 -3px 15px rgba(0,0,0,.15);padding:10px 0 calc(6px + env(safe-area-inset-bottom));z-index:9999;width:100%}
+.menu-mobile-items{display:flex;justify-content:space-around;max-width:500px;margin:0 auto;width:100%}
+.menu-mobile button{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:#1a5c3a;font-family:'Poppins';font-size:10px;font-weight:600;cursor:pointer;position:relative;flex:1}
+.menu-mobile button i{font-size:20px}
+.modal-provas{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:10000;overflow-y:auto;padding:12px;box-sizing:border-box}
+.modal-provas.ativo{display:flex;align-items:center;justify-content:center;padding:15px}
+.modal-content{background:#fff;border-radius:15px;max-width:650px;width:100%;height:auto;max-height:85vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3);align-self:center;animation:modalFade.2s ease}
+@keyframes modalFade{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal-header{background:linear-gradient(135deg,#1a5c3a 0%,#2E865F 100%);color:#fff;padding:16px 18px;border-radius:15px 15px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:2}
+.modal-header h2{font-size:16px;display:flex;align-items:center;gap:8px}
+.btn-fechar{background:rgba(255,255,255,.25);border:none;color:#fff;font-size:20px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:grid;place-items:center}
+.modal-body{padding:14px;height:auto}
+.card-prova-new{background:#fff;border:1px solid #e9efe9;border-left:4px solid #2E865F;padding:12px 14px;margin-bottom:12px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.prova-data{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:8px;background:#f5f7f5;padding:6px 10px;border-radius:8px;width:fit-content}
+.prova-linha{font-size:12.5px;color:#222;margin-bottom:5px;line-height:1.4}.prova-linha strong{color:#000;font-weight:700}
+.prova-assunto-box{background:#f9faf9;border:1px solid #eef2ee;border-radius:8px;padding:8px 10px;margin:6px 0 8px 0}
+.prova-assunto-titulo{font-size:11px;font-weight:700;color:#444;text-transform:uppercase;margin-bottom:4px}
+.prova-assunto-lista{list-style:none;padding:0;margin:0}
+.prova-assunto-lista li{font-size:12px;color:#222;padding:3px 0 3px 18px;position:relative;line-height:1.4}
+.prova-assunto-lista li::before{content:'•';position:absolute;left:4px;top:3px;color:#2E865F;font-weight:900;font-size:14px}
+.card-aviso-turma{background:#fff;border-left:4px solid #2E865F;border-radius:12px;padding:0;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);overflow:hidden;width:100%}
+.aviso-header-top{display:flex;justify-content:space-between;align-items:center;padding:10px 12px 8px;background:#fcfdfc;border-bottom:1px solid #f0f0f0;gap:8px;flex-wrap:wrap}
+.aviso-header-top strong{font-size:12px;color:#1a5c3a;display:flex;align-items:center;gap:6px;font-weight:700}
+.aviso-publicado-pill{font-size:9.5px;color:#2e5a2e;background:#e6f3e8;border:1px solid #c8dfca;padding:5px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;font-weight:600;line-height:1.2;white-space:nowrap}
+.aviso-corpo-novo{padding:10px 12px;background:#fff}
+.aviso-data-linha{font-size:11px;color:#333;line-height:1.5;margin-bottom:6px}
+.data-destaque{background:#ffeb3b;padding:2px 7px;border-radius:6px;font-weight:800;color:#000;font-size:11px;display:inline-block;border:1px solid #f5d547;margin:0 2px}
+.aviso-msg-box{background:#f6f8f6;border:1px solid #e8ece8;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:11px;color:#222;display:flex;gap:7px;line-height:1.4;white-space:pre-line;word-break:break-word}
+.aviso-prof-linha{font-size:10px;color:#1a5c3a;display:flex;gap:5px;align-items:center;font-weight:700;margin-top:6px}
+.btn-pdf{width:100%;background:#1a5c3a;color:#fff;border:none;padding:14px;border-radius:10px;font-family:'Poppins';font-size:15px;font-weight:700;cursor:pointer;margin-top:10px;display:flex;justify-content:center;align-items:center;gap:8px}
+@media(max-width:768px){.menu-desktop{display:none}.menu-mobile{display:flex}.perfil-container{flex-direction:column;text-align:center;gap:10px}.grid-tarefas{grid-template-columns:1fr}body{padding-bottom:90px}.barra-caderno{flex-direction:column;align-items:stretch;gap:10px;padding:0;background:transparent;border:none;box-shadow:none}.bc-lado{flex-direction:column;align-items:center;justify-content:center!important;background:#fff;border:2px solid #1a5c3a;border-radius:12px;padding:12px 10px;width:100%}.bc-top{justify-content:center}.pill{width:100%;text-align:center;white-space:normal;line-height:1.3;padding:8px 12px;font-size:13px;word-break:break-word}.aviso-header-top{flex-direction:column;align-items:flex-start}.aviso-publicado-pill{width:100%;justify-content:center;white-space:normal;text-align:center;font-size:9px}.modal-provas{padding:8px}.modal-provas.ativo{align-items:flex-start;padding-top:20px}.modal-content{max-height:90vh}}
+</style>
+</head>
+<body>
+<div class="header-aluno"><div class="perfil-container"><img src="" alt="Foto Aluno" class="foto-aluno" id="foto-aluno"><div class="info-aluno"><div class="nome-aluno" id="nome-aluno">CARREGANDO...</div><div class="detalhes-aluno"><div><i class="fas fa-calendar-day"></i> <span id="data-hoje"></span></div><div><i class="fas fa-graduation-cap"></i> <span id="serie-turno"></span></div></div></div></div></div>
+<div class="menu-desktop"><button onclick="abrirProvas()"><i class="fas fa-calendar-check"></i> Provas<span class="alerta-prova" id="alerta-prova-desktop" style="display:none;"></span></button><button onclick="abrirAvisos()"><i class="fas fa-bell"></i> Avisos<span class="alerta-prova" id="alerta-aviso-desktop" style="display:none;"></span></button><button onclick="gerarPDFTarefasSemana()"><i class="fas fa-file-pdf"></i> PDF da Semana</button><button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
+<div class="container-tarefas">
+<div class="titulo-secao"><i class="fas fa-tasks"></i> Tarefas do Dia</div>
+<div id="barra-caderno-leitura" class="barra-caderno"><div class="bc-lado"><div class="bc-top"><i class="fas fa-book-open"></i><strong>Caderno de Leitura</strong></div><span class="pill pill-sim" id="texto-caderno-paginas">-</span></div><div class="bc-lado"><div class="bc-top"><i class="fas fa-print"></i><strong>Tarefa Impressa</strong></div><span class="pill pill-sim" id="texto-tarefa-impressa">Não</span></div></div>
+<div class="grid-tarefas" id="grid-tarefas"><div class="loading-tarefas"><i class="fas fa-spinner fa-spin"></i> Carregando...</div></div>
+</div>
+<div class="menu-mobile"><div class="menu-mobile-items"><button onclick="abrirProvas()"><i class="fas fa-calendar-check"></i><span>Provas</span><span class="alerta-prova" id="alerta-prova-mobile" style="display:none;"></span></button><button onclick="abrirAvisos()"><i class="fas fa-bell"></i><span>Avisos</span><span class="alerta-prova" id="alerta-aviso-mobile" style="display:none;"></span></button><button onclick="gerarPDFTarefasSemana()"><i class="fas fa-file-pdf"></i><span>PDF</span></button><button onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Sair</span></button></div></div>
+<div class="modal-provas" id="modal-provas"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-calendar-check"></i> Agenda de Provas</h2><button class="btn-fechar" onclick="fecharProvas()">×</button></div><div class="modal-body" id="lista-provas"></div></div></div>
+<div class="modal-provas" id="modal-avisos"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-bell"></i> Avisos da Turma</h2><button class="btn-fechar" onclick="fecharAvisos()">×</button></div><div class="modal-body" id="lista-avisos"></div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, limit, updateDoc, arrayUnion, Timestamp, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+const firebaseConfig = { apiKey: "AIzaSyDJnKktnaupmHUwL-jZHIeionowOb6Egrg", authDomain: "agenda-escolar-19fda.firebaseapp.com", projectId: "agenda-escolar-19fda", storageBucket: "agenda-escolar-19fda.firebasestorage.app", messagingSenderId: "460998217684", appId: "1:460998217684:web:98e4a2cc23b467124bd041" };
+const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+let dadosAlunoGlobal=null, cacheAgendas=[], provasGlobal=[], cacheTarefasSemana={};
+function formatarData(){return new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase())}
+function formatarDataFirebase(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function normalizarPaginas(t){if(!t) return '-';let txt=t.toString().trim();if(!txt) return '-';let p=txt.split(/[\s,;\-\/|]+/).map(s=>s.trim()).filter(Boolean);p=[...new Set(p)];return p.join(' • ')}
+function getSemanaISO(d){const dd=new Date(d+'T00:00:00');const jan4=new Date(dd.getFullYear(),0,4);const diff=(dd-jan4)/86400000;return `${dd.getFullYear()}-W${String(Math.ceil((diff+jan4.getDay()+1)/7)).padStart(2,'0')}`}
+function formatarDataCompleta(t){if(!t) return 'N/A';const d=t.toDate?t.toDate():new Date(t);return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',', ' às')}
+function formatarDataSimples(t){if(!t) return '';const d=t.toDate?t.toDate():new Date(t);return d.toLocaleDateString('pt-BR')}
+function isSim(v){ if(v===true) return true; if(typeof v==='string') return v.toLowerCase().includes('sim'); return false; }
+function formatarAssuntoProva(texto){
+  if(!texto) return '<li>Nenhum assunto informado</li>';
+  let linhas = texto.toString().split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  if(linhas.length===1 && linhas[0].includes('•')) linhas = linhas[0].split('•').map(s=>s.trim()).filter(Boolean);
+  if(linhas.length===1 && linhas[0].includes('/')) linhas = linhas[0].split('/').map(s=>s.trim()).filter(Boolean);
+  linhas = linhas.map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
+  if(linhas.length<=1) return `<li>${texto}</li>`;
+  return linhas.map(l=>`<li>${l}</li>`).join('');
+}
+function getEstiloDisciplina(nome){
+  const n = (nome||'').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  if(n.includes('matematica')) return {cor:'#E3F2FD', corIconBg:'#BBDEFB', corIcon:'#1565C0', icon:'fa-calculator'};
+  if(n.includes('natureza') || n.includes('sociedade')) return {cor:'#E8F5E9', corIconBg:'#C8E6C9', corIcon:'#2E7D32', icon:'fa-seedling'};
+  if(n.includes('leitura')) return {cor:'#F3E5F5', corIconBg:'#E1BEE7', corIcon:'#6A1B9A', icon:'fa-book-open-reader'};
+  if(n.includes('portugues') || n.includes('linguagem')) return {cor:'#FFF3E0', corIconBg:'#FFE0B2', corIcon:'#E65100', icon:'fa-spell-check'};
+  if(n.includes('historia')) return {cor:'#FFEBEE', corIconBg:'#FFCDD2', corIcon:'#B71C1C', icon:'fa-landmark'};
+  if(n.includes('geografia')) return {cor:'#E0F7FA', corIconBg:'#B2EBF2', corIcon:'#006064', icon:'fa-earth-americas'};
+  if(n.includes('artes')) return {cor:'#FCE4EC', corIconBg:'#F8BBD0', corIcon:'#AD1457', icon:'fa-palette'};
+  if(n.includes('ingles')) return {cor:'#E8F5E9', corIconBg:'#A5D6A7', corIcon:'#1B5E20', icon:'fa-language'};
+  if(n.includes('ciencias')) return {cor:'#F1F8E9', corIconBg:'#DCEDC8', corIcon:'#33691E', icon:'fa-flask'};
+  return {cor:'#E8EAF6', corIconBg:'#C5CAE9', corIcon:'#283593', icon:'fa-book'};
+}
+async function registrarAcessoAnalytics(t){try{if(sessionStorage.getItem('aluno_access_counted_this_session')==='true') return;const uid=auth.currentUser.uid;const user=auth.currentUser;const hoje=new Date();const dia=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;const mes=dia.substring(0,7);const ano=String(hoje.getFullYear());const semana=getSemanaISO(dia);await addDoc(collection(db,'analytics_access'),{userId:uid,email:user.email||'',nome:dadosAlunoGlobal?.nome||user.displayName||'',tipo_usuario:t,serie:dadosAlunoGlobal?.serie||'',turno:dadosAlunoGlobal?.turno||'',dia,mes,ano,semana,data:Timestamp.now(),criadoEm:serverTimestamp()});sessionStorage.setItem('aluno_access_counted_this_session','true')}catch(e){}}
+document.getElementById('data-hoje').textContent=formatarData();
+window.logout=()=>{sessionStorage.removeItem('aluno_access_counted_this_session');signOut(auth).then(()=>{window.location.href='index.html'})};
+window.abrirProvas=()=>{document.getElementById('modal-provas').classList.add('ativo');carregarProvasDoCache()};
+window.fecharProvas=()=>{document.getElementById('modal-provas').classList.remove('ativo')};
+window.abrirAvisos=async()=>{document.getElementById('modal-avisos').classList.add('ativo');await carregarAvisosDoCache()};
+window.fecharAvisos=()=>{document.getElementById('modal-avisos').classList.remove('ativo')};
+async function carregarTudoUnificado(serie, turno){
+  const grid=document.getElementById('grid-tarefas');const barra=document.getElementById('barra-caderno-leitura');
+  const txtCaderno=document.getElementById('texto-caderno-paginas');const txtImpressa=document.getElementById('texto-tarefa-impressa');
+  const dataHoje=formatarDataFirebase();const turnoLimpo=turno.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+
+  // REGRA QUE VOCÊ PEDIU: SÓ MOSTRA CADERNO E IMPRESSA SE FOR JARDIM
+  const ehJardim = (serie||'').toUpperCase().includes('JARDIM');
+
+  const q = query(collection(db,'agendas'), where('serie','==',serie), where('turno','==',turnoLimpo), limit(150));
+  const snap = await getDocs(q);cacheAgendas=[]; snap.forEach(d=>{cacheAgendas.push({id:d.id,...d.data()})});
+  const tarefasHoje = cacheAgendas.filter(a=>a.tipo==='tarefa' && a.data===dataHoje);
+  const provasFuturas = cacheAgendas.filter(a=>{ if(a.tipo!=='prova') return false; return (a.dataProva||a.data||'')>=dataHoje;}).sort((a,b)=>(a.dataProva||'').localeCompare(b.dataProva||''));
+  const avisosValidos = cacheAgendas.filter(a=>{ if(a.tipo!=='aviso') return false; if(!a.dataValidade) return true; const v=a.dataValidade.toDate?a.dataValidade.toDate():new Date(a.dataValidade.seconds*1000); return v>=new Date();});
+  provasGlobal=provasFuturas;
+  if(tarefasHoje.length===0){
+    grid.innerHTML=`<div class="sem-tarefas">Nenhuma tarefa para hoje! ${dataHoje.split('-').reverse().join('/')}</div>`;
+    barra.classList.remove('show');
+  }
+  else{
+    let html='',paginas=[],temImp=false,temLei=false;
+    tarefasHoje.forEach(t=>{
+      const lei=isSim(t.cadernoLeitura)||isSim(t.caderno_leitura);const imp=isSim(t.impressa)||isSim(t.tarefaImpressa)||isSim(t.temImpressa);
+      if(lei){temLei=true;if(t.cadernoPaginas) paginas.push(t.cadernoPaginas.toString().trim());}if(imp) temImp=true;
+      const discRaw=(t.disciplina||'').toUpperCase();
+      const disc=discRaw||'DISCIPLINA';
+      const pag=normalizarPaginas(t.livro||t.pagina||'-');
+      const obs=(t.observacao||t.obs||'Sem observação').toString().trim();
+      const prof=(t.professor||t.nome_professor||'').replace(/^Prof\.?\s*/i,'').toUpperCase();
+      const estilo=getEstiloDisciplina(discRaw);
+      html+=`<div class="tf-card"><div class="tf-esq" style="background:${estilo.cor}"><div class="tf-esq-ic" style="background:${estilo.corIconBg};color:${estilo.corIcon}"><i class="fas ${estilo.icon}"></i></div><h3>${disc}</h3><span>DISCIPLINA</span></div><div class="tf-dir"><div class="tf-tit">Detalhes da Tarefa</div><div class="tf-item"><div class="tf-ic"><i class="far fa-file-lines"></i></div><div class="tf-tx"><label>LIVRO / PÁGINA</label><p>${pag}</p></div></div><div class="tf-item"><div class="tf-ic"><i class="fas fa-circle-info"></i></div><div class="tf-tx"><label>OBSERVAÇÃO</label><p>${obs}</p></div></div><div class="tf-item"><div class="tf-ic"><i class="far fa-user"></i></div><div class="tf-tx"><label>PROFESSOR</label><p>${prof}</p></div></div></div></div>`;
+    });
+    grid.innerHTML=html;
+
+    // AQUI ESTÁ O PULO DO GATO
+    if(ehJardim){
+      if(temLei){let u=[...new Set(paginas.join(' • ').split(' • ').map(s=>s.trim()).filter(Boolean))];txtCaderno.textContent=u.length?`Página ${u.join(' • ')}`:'Sim';txtCaderno.className='pill pill-sim';}else{txtCaderno.textContent='Não';txtCaderno.className='pill pill-nao';}
+      txtImpressa.textContent=temImp?'Sim':'Não';txtImpressa.className=temImp?'pill pill-sim':'pill pill-nao';
+      barra.classList.add('show');
+    } else {
+      // FUNDAMENTAL: ESCONDE SEMPRE
+      barra.classList.remove('show');
+    }
+  }
+  const qtdProvas=provasFuturas.filter(p=>(p.dataProva||'')>dataHoje).length;
+  const dP=document.getElementById('alerta-prova-desktop'), mP=document.getElementById('alerta-prova-mobile');
+  if(qtdProvas>0){const t=qtdProvas>9?'9+':qtdProvas; dP.textContent=t; mP.textContent=t; dP.style.display='flex'; mP.style.display='flex';}else{dP.style.display='none'; mP.style.display='none';}
+  const uid=auth.currentUser.uid;const qtdAvisos=avisosValidos.filter(a=>!a.lidos||!a.lidos.includes(uid)).length;
+  const dA=document.getElementById('alerta-aviso-desktop'), mA=document.getElementById('alerta-aviso-mobile');
+  if(qtdAvisos>0){const t=qtdAvisos>9?'9+':qtdAvisos; dA.textContent=t; mA.textContent=t; dA.style.display='flex'; mA.style.display='flex';}else{dA.style.display='none'; mA.style.display='none';}
+  cacheTarefasSemana={}; cacheAgendas.filter(a=>a.tipo==='tarefa').forEach(t=>{ if(!cacheTarefasSemana[t.data]) cacheTarefasSemana[t.data]=[]; cacheTarefasSemana[t.data].push(t);});
+}
+function carregarProvasDoCache(){
+  const l=document.getElementById('lista-provas');
+  if(provasGlobal.length===0){ l.innerHTML=`<div class="sem-tarefas">Nenhuma prova agendada!</div>`; return;}
+  let h='';provasGlobal.forEach(p=>{
+    const df=new Date((p.dataProva||p.data)+'T00:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    const estilo=getEstiloDisciplina(p.disciplina);
+    const assuntoFormatado=formatarAssuntoProva(p.assunto||'');
+    h+=`<div class="card-prova-new" style="border-left-color:${estilo.corIcon}"><div class="prova-data"><i class="fas fa-calendar-day"></i> ${df}</div><div class="prova-linha"><strong>Assunto da Prova:</strong> ${p.disciplina}</div><div class="prova-assunto-box"><div class="prova-assunto-titulo">Conteúdo:</div><ul class="prova-assunto-lista">${assuntoFormatado}</ul></div><div class="prova-linha"><strong>Professor:</strong> ${(p.nome_professor||'').replace(/^Prof\.?\s*/i,'')}</div></div>`;
+  });h+=`<button class="btn-pdf" onclick="gerarPDF()"><i class="fas fa-file-pdf"></i> Gerar PDF de Provas</button>`;l.innerHTML=h;
+}
+async function carregarAvisosDoCache(){
+  const lista=document.getElementById('lista-avisos');const uid=auth.currentUser.uid;
+  const avisos=cacheAgendas.filter(a=>{ if(a.tipo!=='aviso') return false; if(!a.dataValidade) return true; const v=a.dataValidade.toDate?a.dataValidade.toDate():new Date(a.dataValidade.seconds*1000); return v>=new Date();});
+  if(avisos.length===0){ lista.innerHTML=`<div class="sem-tarefas">Nenhum aviso!</div>`; return;}
+  let html='',ids=[];
+  avisos.forEach(a=>{
+    if(!a.lidos||!a.lidos.includes(uid)) ids.push(a.id);
+    const pub=formatarDataCompleta(a.criadoEm);const ini=formatarDataSimples(a.dataInicio);const fim=formatarDataSimples(a.dataValidade);
+    let txt; if(!a.dataInicio||ini===fim) txt=`na presente data <span class="data-destaque">${fim||ini}</span>`; else txt=`no período de <span class="data-destaque">${ini}</span> a <span class="data-destaque">${fim}</span>`;
+    let prof=(a.nome_professor||a.professor||'').toString().replace(/^(Prof\.?\s*)+/gi,'').trim().toUpperCase();
+    html+=`<div class="card-aviso-turma"><div class="aviso-header-top"><strong><i class="fas fa-bullhorn"></i> Aviso</strong><span class="aviso-publicado-pill"><i class="far fa-clock"></i> Publicado: ${pub}</span></div><div class="aviso-corpo-novo"><div class="aviso-data-linha">${txt}</div><div class="aviso-msg-box"><i class="fas fa-bars-staggered" style="margin-top:2px"></i><span>${(a.aviso||a.mensagem||'').toString()}</span></div><div class="aviso-prof-linha"><i class="fas fa-chalkboard-teacher"></i> Prof. ${prof}</div></div></div>`;
+  });lista.innerHTML=html;for(const id of ids){ try{ await updateDoc(doc(db,'agendas',id),{lidos:arrayUnion(uid)}) }catch(e){}}
+}
+window.gerarPDF=()=>{
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF('p','mm','a4');
+  const verdeEscuro=[22,74,47];
+  const verdeBarra=[107,155,107];
+  const verdeClaroTitulo=[212,232,208];
+  const verdeClaroFundo=[240,247,240];
+  const verdeBorda=[168,216,176];
+  function iconeCalendario(x,y){
+    doc.setDrawColor(255,255,255);doc.setLineWidth(0.35);
+    doc.setFillColor(255,255,255);
+    doc.roundedRect(x,y,5,5,0.7,0.7,'FD');
+    doc.setFillColor(...verdeBarra);
+    doc.rect(x,y,5,1.3,'F');
+    doc.setDrawColor(...verdeBarra);
+    doc.setLineWidth(0.2);
+    doc.line(x+1,y+2.2,x+1,y+4);doc.line(x+2.5,y+2.2,x+2.5,y+4);doc.line(x+4,y+2.2,x+4,y+4);
+  }
+  function iconeDoc(x,y){
+    doc.setDrawColor(255,255,255);doc.setLineWidth(0.35);
+    doc.setFillColor(255,255,255);
+    doc.roundedRect(x,y,4,5,0.5,0.5,'FD');
+    doc.setDrawColor(...verdeBarra);
+    doc.setLineWidth(0.25);
+    doc.line(x+0.8,y+1.5,x+3.2,y+1.5);doc.line(x+0.8,y+2.5,x+3.2,y+2.5);doc.line(x+0.8,y+3.5,x+3.2,y+3.5);
+  }
+  doc.setFillColor(...verdeEscuro);
+  doc.rect(0,0,210,28,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(11);doc.setFont('helvetica','bold');
+  doc.text('INSTITUTO EDUCACIONAL MARITO DUTRA',12,9);
+  doc.setFontSize(8);doc.setFont('helvetica','normal');
+  doc.setTextColor(200,230,200);
+  doc.text('Agenda Escolar Digital - 2026 - Avaliações',12,14);
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(10);doc.setFont('helvetica','bold');
+  doc.text((dadosAlunoGlobal?.nome||'ALUNO').toUpperCase(),12,20);
+  doc.setFontSize(8);doc.setFont('helvetica','normal');
+  doc.text(`${dadosAlunoGlobal?.serie||''} - ${dadosAlunoGlobal?.turno||''} | ${new Date().toLocaleDateString('pt-BR')}`,12,24);
+  doc.setFillColor(212,244,226);
+  doc.rect(0,28,210,4,'F');
+  if(provasGlobal.length===0){
+    doc.setTextColor(80,80,80);doc.setFontSize(11);
+    doc.text('Nenhuma prova agendada!',105,60,{align:'center'});
+    doc.save(`Provas_${dadosAlunoGlobal?.nome||'aluno'}.pdf`);
+    return;
+  }
+  let porData={};
+  provasGlobal.forEach(p=>{const k=p.dataProva||p.data;if(!porData[k]) porData[k]=[];porData[k].push(p)});
+  let y=38;
+  for(let dk of Object.keys(porData).sort()){
+    let lista=porData[dk];
+    let dt=new Date(dk+'T00:00:00');
+    let tit=`${dt.toLocaleDateString('pt-BR',{weekday:'long'}).toUpperCase()} - ${dt.toLocaleDateString('pt-BR')}`;
+    if(y>250){doc.addPage();y=15;}
+    doc.setFillColor(...verdeBarra);
+    doc.roundedRect(10,y,190,10,2.5,2.5,'F');
+    iconeCalendario(13,y+2.5);
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');doc.setFontSize(8);
+    doc.text(`${tit}`,21,y+6.5);
+    iconeDoc(165,y+2.5);
+    doc.text(`${lista.length} avaliações`,171,y+6.5);
+    y+=15;
+    let xCol=0; let x=10;
+    const cardW=92; const cardH=32;
+    for(let p of lista){
+      if(xCol===0) x=10; else x=108;
+      if(y+cardH>285){
+        if(xCol===1){xCol=0;x=10;y+=cardH+4;}
+        if(y+cardH>285){doc.addPage();y=15;x=10;xCol=0;}
+      }
+      doc.setDrawColor(...verdeBorda);doc.setLineWidth(0.45);
+      doc.setFillColor(...verdeClaroFundo);
+      doc.roundedRect(x,y,cardW,cardH,3,3,'FD');
+      doc.setFillColor(...verdeClaroTitulo);
+      doc.roundedRect(x+1,y+1,cardW-2,8,2,2,'F');
+      doc.setTextColor(...verdeEscuro);
+      doc.setFont('helvetica','bold');doc.setFontSize(7.5);
+      let disc=(p.disciplina||'').toUpperCase().substring(0,26);
+      doc.text(disc,x+cardW/2,y+6,{align:'center'});
+      let assuntoX=x+2; let assuntoY=y+11.5; let assuntoW=19; let assuntoH=18;
+      doc.setFillColor(255,255,255);doc.setDrawColor(...verdeBorda);doc.setLineWidth(0.35);
+      doc.roundedRect(assuntoX,assuntoY,assuntoW,assuntoH,2.5,2.5,'FD');
+      doc.setTextColor(30,30,30);doc.setFont('helvetica','bold');doc.setFontSize(6.5);
+      doc.text('assunto',assuntoX+assuntoW/2,assuntoY+assuntoH/2+1,{align:'center'});
+      let conteudoX=assuntoX+assuntoW+2; let conteudoY=assuntoY;
+      let conteudoW=cardW-assuntoW-6;
+      doc.setFillColor(255,255,255);
+      doc.setDrawColor(...verdeBorda);
+      doc.roundedRect(conteudoX,conteudoY,conteudoW,18,2.5,2.5,'FD');
+      doc.setTextColor(20,20,20);doc.setFont('helvetica','normal');doc.setFontSize(6);
+      let linhas=doc.splitTextToSize((p.assunto||'').toString(),conteudoW-4);
+      if(linhas.length>3) linhas=linhas.slice(0,3);
+      doc.text(linhas,conteudoX+2,conteudoY+5);
+      if(xCol===0){xCol=1;}else{xCol=0;y+=cardH+4;}
+    }
+    if(xCol===1) y+=cardH+4;
+    y+=4;
+  }
+  doc.save(`Provas_${(dadosAlunoGlobal?.nome||'aluno').replace(/\s+/g,'_')}.pdf`);
+};
+window.gerarPDFTarefasSemana=async()=>{
+  const {jsPDF}=window.jspdf; const doc=new jsPDF('p','mm','a4');
+  doc.setFillColor(26,72,48);doc.rect(0,0,210,22,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('INSTITUTO EDUCACIONAL MARITO DUTRA',8,8);
+  doc.setFontSize(7);doc.setFont('helvetica','normal');doc.text('Agenda Escolar Digital - 2026',8,12);
+  doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text((dadosAlunoGlobal.nome||'').toUpperCase(),8,16);
+  doc.setFontSize(6.5);doc.setFont('helvetica','normal');doc.text(`${dadosAlunoGlobal.serie} - ${dadosAlunoGlobal.turno.toLowerCase()} | ${new Date().toLocaleDateString('pt-BR')}`,8,19);
+  doc.setFillColor(212,244,226);doc.rect(0,22,210,2,'F');
+  const hoje=new Date();const diaSem=hoje.getDay();const segunda=new Date(hoje);segunda.setDate(hoje.getDate()-diaSem+(diaSem===0?-6:1));
+  let tarefasPorDia={},dias=[];
+  for(let i=0;i<5;i++){ let d=new Date(segunda);d.setDate(segunda.getDate()+i); let ds=d.toISOString().split('T')[0]; let nome=['Domingo','Segunda-Feira','Terça-Feira','Quarta-Feira','Quinta-Feira','Sexta-Feira','Sábado'][d.getDay()]; let br=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}); let lista=cacheTarefasSemana[ds]||[]; if(lista.length>0){let k=`${nome} - ${br} - ${ds}`;tarefasPorDia[k]=lista;dias.push(k)}}
+  let y=28;
+  if(dias.length===0){ doc.setFillColor(255,255,255);doc.setDrawColor(180,210,180);doc.roundedRect(10,y,190,14,2,2,'FD');doc.setTextColor(100,100,100);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text('Nenhuma tarefa lançada para esta semana!',105,y+8,{align:'center'});doc.save(`PDF_Semana_${dadosAlunoGlobal.nome}.pdf`);return;}
+  for(let dk of dias){
+    if(y>230){doc.addPage();y=10;}
+    let p=dk.split(' - '); let nomeDia=p[0]; let dataBr=p[1]; let lista=tarefasPorDia[dk];
+    let pags=[]; let temLei=false, temImp=false;
+    lista.forEach(t=>{ if(isSim(t.cadernoLeitura)){ temLei=true; if(t.cadernoPaginas) pags.push(t.cadernoPaginas.toString().trim());} if(isSim(t.impressa)||isSim(t.tarefaImpressa)) temImp=true;});
+    let txtCaderno='Não'; if(temLei){ if(pags.length){ let u=[...new Set(pags.join(' • ').split(' • ').map(s=>s.trim()).filter(Boolean))]; txtCaderno=`Página ${u.join(' • ')}`;} else txtCaderno='Sim';}
+    let txtImp=temImp?'Sim':'Não';
+    let yInicio = y;
+    doc.setFillColor(107,125,140);doc.roundedRect(12,y,186,8,2,2,'F');
+    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.text(`${nomeDia.toUpperCase()} - ${dataBr}`,15,y+5.2);
+    doc.setFontSize(6);doc.setFont('helvetica','normal');doc.text(`${lista.length} tarefa(s)`,195,y+5.2,{align:'right'});y+=10;
+
+    const ehJardimPDF = (dadosAlunoGlobal.serie||'').toUpperCase().includes('JARDIM');
+    if(ehJardimPDF){
+      doc.setFillColor(255,255,255);doc.setDrawColor(100,100,100);doc.setLineWidth(0.25);doc.roundedRect(12,y,186,9,2,2,'FD');
+      doc.setFont('helvetica','bold');doc.setFontSize(6);doc.setTextColor(40,40,40);doc.text('CADERNO DE LEITURA',15,y+5.5);
+      let wC=doc.getTextWidth(txtCaderno)+6; doc.setFillColor(214,232,208);doc.setDrawColor(180,210,180);doc.roundedRect(46,y+1.5,wC,6,2,2,'FD');doc.setTextColor(26,61,40);doc.setFontSize(6);doc.text(txtCaderno,48,y+5.2);
+      doc.setTextColor(40,40,40);doc.text('TAREFA IMPRESSA',140,y+5.5);
+      let wI=doc.getTextWidth(txtImp)+6; let xI=194-wI;
+      if(temImp){doc.setFillColor(209,240,216);doc.setDrawColor(168,216,176);}else{doc.setFillColor(255,224,224);doc.setDrawColor(255,180,180);}
+      doc.roundedRect(xI,y+1.5,wI,6,2,2,'FD');doc.setTextColor(temImp?22:185,temImp?101:28,temImp?52:28);doc.text(txtImp,xI+3,y+5.2);
+      y+=14;
+    }
+
+    let cardsPos=[];
+    let yAtual = y;
+    let idx=0;
+    while(idx < lista.length){
+      let t1 = lista[idx];
+      let obs1 = (t1.observacao||t1.obs||'Sem observação').toString();
+      let linhas1 = doc.splitTextToSize(`Obs: ${obs1}`,86);
+      let alt1 = 24 + (linhas1.length*3.2);
+      let t2 = (idx+1 < lista.length)? lista[idx+1] : null;
+      let linhas2 = null, alt2 = 0;
+      if(t2){ let obs2=(t2.observacao||t2.obs||'Sem observação').toString(); linhas2=doc.splitTextToSize(`Obs: ${obs2}`,86); alt2=24+(linhas2.length*3.2); }
+      let altLinha = Math.max(alt1, alt2 || 0);
+      if(yAtual + altLinha > 275){ doc.addPage(); yAtual=10; yInicio=8; }
+      cardsPos.push({x:12, y:yAtual, alt:alt1, t:t1, linhas:linhas1});
+      if(t2) cardsPos.push({x:105, y:yAtual, alt:alt2, t:t2, linhas:linhas2});
+      yAtual += altLinha + 4;
+      idx+=2;
+    }
+    let yFimCards = yAtual;
+    for(let c of cardsPos){
+      doc.setFillColor(255,255,255);doc.setDrawColor(200,210,200);doc.setLineWidth(0.2);doc.roundedRect(c.x,c.y,91,c.alt,2,2,'FD');
+      doc.setFillColor(232,238,242);doc.roundedRect(c.x,c.y,91,7,2,2,'F');doc.rect(c.x,c.y+4,91,3,'F');
+      doc.setFontSize(6.5);doc.setTextColor(40,40,80);doc.setFont('helvetica','bold');doc.text((c.t.disciplina||'DISCIPLINA').toUpperCase().substring(0,24),c.x+3,c.y+4.8);
+      doc.setFont('helvetica','normal');doc.setTextColor(50,50,50);doc.setFontSize(5.5);doc.text(`Livro: ${normalizarPaginas(c.t.livro||c.t.pagina||'-')}`,c.x+3,c.y+10.5);doc.text(c.linhas,c.x+3,c.y+13.5);
+      let py=c.y+13.5+(c.linhas.length*3.1)+1;doc.setFontSize(5);doc.setTextColor(80,80,80);doc.text(`Prof: ${(c.t.professor||c.t.nome_professor||'-').substring(0,26)}`,c.x+3,py);
+    }
+    let alturaTotal = (yFimCards - yInicio) + 2;
+    doc.setDrawColor(200,230,180);doc.setLineWidth(0.4);doc.roundedRect(10,yInicio-2,190,alturaTotal+6,4,4,'D');
+    y=yFimCards+8;
+  }
+  doc.save(`PDF_Semana_${dadosAlunoGlobal.nome.replace(/\s+/g,'_')}.pdf`);
+};
+onAuthStateChanged(auth,async(user)=>{if(user){const s=await getDoc(doc(db,"alunos",user.uid));if(s.exists()){const d=s.data();dadosAlunoGlobal=d;document.getElementById('nome-aluno').textContent=d.nome.toUpperCase();document.getElementById('serie-turno').textContent=`${d.serie} - ${d.turno}`;document.getElementById('foto-aluno').src=d.foto||'./img/aluna.png';await carregarTudoUnificado(d.serie,d.turno);registrarAcessoAnalytics('aluno')}else{window.location.href='index.html'}}else{window.location.href='index.html'}});
+</script>
+</body>
+</html>
