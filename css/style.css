@@ -1,0 +1,67 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body{ background-color: rgb(3, 54, 24); font-family: Arial, sans-serif; }
+
+.geral {
+  padding: 15px 25px;
+  display: flex;
+  background-color: aquamarine;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  border-radius: 0px 0px 18% 18%;
+}
+h1 { color: rgb(4, 96, 73); font-family: 'Dancing Script', cursive; }
+p { color: rgb(12, 132, 80); margin-top: 5px; }
+#logout-button{ padding: 10px 18px; background-color: #63e89f; border:none; border-radius:6px; cursor:pointer; font-weight:bold; }
+.logo { width: 100px; margin-left: 2%; flex-shrink:0; }
+.logo-img { width: 100px; display:block; }
+.titulo { width: 60%; text-align: center; margin: auto; }
+.titulo h1{ font-size:28px; margin-top:5px; }
+
+.botoes{ display: flex; gap: 14px; margin-right: 2%; align-items:center; }
+.area-aluno,.area-professor {
+  border: 1px solid #171717;
+  height: 50px;
+  width: 90px;
+  background-color: white;
+  border-radius: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition:0.2s;
+}
+.area-aluno:hover,.area-professor:hover{ transform: translateY(-3px); }
+.logo-aluno-professor { width: 38px; height: 38px; object-fit: contain; display:block; }
+hr{ border:0; }
+
+/* MODAIS */
+.modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 3000; width: 320px; text-align: center; border-left: 5px solid #63e89f; }
+.modal h2 { margin-bottom: 20px; font-family: 'Dancing Script', cursive; }
+.modal input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; }
+.modal button { width: 90%; padding: 10px; margin: 10px 0; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; }
+.modal button[type="button"] { background: #f44336; }
+.password-wrapper { width: 90%; margin: 10px auto; position: relative; }
+.password-wrapper input { width: 100%; padding: 10px 40px 10px 10px; }
+.toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; }
+
+/* RESPONSIVO - CORRIGIDO E DESCOLADO */
+@media (max-width: 768px) {
+ .geral { flex-direction: column; padding: 20px 15px; }
+ .titulo { width: 100%; order: 2; }
+ .titulo h1 { font-size: 20px; }
+ .logo { margin: 0 auto; order: 1; width:80px; }
+ .logo-img{ width:80px; }
+ .botoes{ 
+   order: 3; 
+   width: 90%;
+   max-width: 300px;
+   display: flex !important; 
+   flex-direction: column !important; 
+   gap: 12px; /* AQUI DESCOLA, NÃO FICA COLADO */
+   margin: 12px auto 0; 
+   justify-content:center; 
+ }
+ .area-aluno,.area-professor{ width: 100%; height: 58px; margin:0; padding: 5px; }
+}
