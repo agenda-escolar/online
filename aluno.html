@@ -20,7 +20,8 @@ body{background:#d4f4e2;font-family:'Poppins',sans-serif;padding-bottom:90px}
 .detalhes-aluno{font-size:12px;opacity:.95;display:flex;flex-direction:column;gap:2px;margin-top:6px}
 .menu-desktop{background:#fff;max-width:1100px;margin:-10px auto 18px;border-radius:12px;box-shadow:0 3px 12px rgba(0,0,0,.1);display:flex;justify-content:space-around;padding:14px;width:calc(100% - 24px)}
 .menu-desktop button{background:none;border:none;font-family:'Poppins';font-size:14px;font-weight:600;color:#1a5c3a;cursor:pointer;display:flex;align-items:center;gap:7px;position:relative;padding:8px 14px;border-radius:8px}
-.alerta-prova{position:absolute;top:-8px;right:-8px;min-width:18px;height:18px;background:#dc2626;border-radius:10px;border:2px solid #fff;color:#fff;font-size:11px;font-weight:bold;display:flex;align-items:center;justify-content:center;animation:pulse-vermelho 1.5s infinite;z-index:10}
+.icon-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;margin-right:2px}
+.alerta-prova{position:absolute;top:-18px;right:-18px;min-width:18px;height:18px;background:#dc2626;border-radius:10px;border:2px solid #fff;color:#fff;font-size:11px;font-weight:bold;display:flex;align-items:center;justify-content:center;animation:pulse-vermelho 1.5s infinite;z-index:10;padding:0 4px}
 @keyframes pulse-vermelho{0%{box-shadow:0 0 0 0 rgba(220,38,38,.7)}70%{box-shadow:0 0 0 10px rgba(220,38,38,0)}100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}}
 .container-tarefas{max-width:1100px;margin:0 auto;padding:0 12px;width:100%}
 .titulo-secao{background:#6b9b6b;color:#fff;text-align:center;padding:13px;border-radius:10px;font-weight:700;margin-bottom:10px}
@@ -76,13 +77,13 @@ body{background:#d4f4e2;font-family:'Poppins',sans-serif;padding-bottom:90px}
 </head>
 <body>
 <div class="header-aluno"><div class="perfil-container"><img src="" alt="Foto Aluno" class="foto-aluno" id="foto-aluno"><div class="info-aluno"><div class="nome-aluno" id="nome-aluno">CARREGANDO...</div><div class="detalhes-aluno"><div><i class="fas fa-calendar-day"></i> <span id="data-hoje"></span></div><div><i class="fas fa-graduation-cap"></i> <span id="serie-turno"></span></div></div></div></div></div>
-<div class="menu-desktop"><button onclick="abrirProvas()"><i class="fas fa-calendar-check"></i> Provas<span class="alerta-prova" id="alerta-prova-desktop" style="display:none;"></span></button><button onclick="abrirAvisos()"><i class="fas fa-bell"></i> Avisos<span class="alerta-prova" id="alerta-aviso-desktop" style="display:none;"></span></button><button onclick="gerarPDFTarefasSemana()"><i class="fas fa-file-pdf"></i> PDF da Semana</button><button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
+<div class="menu-desktop"><button onclick="abrirProvas()"><span class="icon-wrap"><i class="fas fa-calendar-check"></i><span class="alerta-prova" id="alerta-prova-desktop" style="display:none;"></span></span> Provas</button><button onclick="abrirAvisos()"><span class="icon-wrap"><i class="fas fa-bell"></i><span class="alerta-prova" id="alerta-aviso-desktop" style="display:none;"></span></span> Avisos</button><button onclick="gerarPDFTarefasSemana()"><i class="fas fa-file-pdf"></i> PDF da Semana</button><button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
 <div class="container-tarefas">
 <div class="titulo-secao"><i class="fas fa-tasks"></i> Tarefas do Dia</div>
-<div id="barra-caderno-leitura" class="barra-caderno"><div class="bc-lado"><div class="bc-top"><i class="fas fa-book-open"></i><strong>Caderno de Leitura</strong></div><span class="pill pill-sim" id="texto-caderno-paginas">-</span></div><div class="bc-lado"><div class="bc-top"><i class="fas fa-print"></i><strong>Tarefa Impressa</strong></div><span class="pill pill-sim" id="texto-tarefa-impressa">Não</span></div></div>
+<div id="barra-caderno-leitura" class="barra-caderno"><div class="bc-lado" id="box-caderno" style="display:none"><div class="bc-top"><i class="fas fa-book-open"></i><strong>Caderno de Leitura</strong></div><span class="pill pill-sim" id="texto-caderno-paginas">-</span></div><div class="bc-lado" id="box-impressa" style="display:none"><div class="bc-top"><i class="fas fa-print"></i><strong>Tarefa Impressa</strong></div><span class="pill pill-sim">Sim</span></div></div>
 <div class="grid-tarefas" id="grid-tarefas"><div class="loading-tarefas"><i class="fas fa-spinner fa-spin"></i> Carregando...</div></div>
 </div>
-<div class="menu-mobile"><div class="menu-mobile-items"><button onclick="abrirProvas()"><i class="fas fa-calendar-check"></i><span>Provas</span><span class="alerta-prova" id="alerta-prova-mobile" style="display:none;"></span></button><button onclick="abrirAvisos()"><i class="fas fa-bell"></i><span>Avisos</span><span class="alerta-prova" id="alerta-aviso-mobile" style="display:none;"></span></button><button onclick="gerarPDFTarefasSemana()"><i class="fas fa-file-pdf"></i><span>PDF</span></button><button onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Sair</span></button></div></div>
+<div class="menu-mobile"><div class="menu-mobile-items"><button onclick="abrirProvas()"><span class="icon-wrap"><i class="fas fa-calendar-check"></i><span class="alerta-prova" id="alerta-prova-mobile" style="display:none;"></span></span><span>Provas</span></button><button onclick="abrirAvisos()"><span class="icon-wrap"><i class="fas fa-bell"></i><span class="alerta-prova" id="alerta-aviso-mobile" style="display:none;"></span></span><span>Avisos</span></button><button onclick="gerarPDFTarefasSemana()"><i class="fas fa-file-pdf"></i><span>PDF</span></button><button onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Sair</span></button></div></div>
 <div class="modal-provas" id="modal-provas"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-calendar-check"></i> Agenda de Provas</h2><button class="btn-fechar" onclick="fecharProvas()">×</button></div><div class="modal-body" id="lista-provas"></div></div></div>
 <div class="modal-provas" id="modal-avisos"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-bell"></i> Avisos da Turma</h2><button class="btn-fechar" onclick="fecharAvisos()">×</button></div><div class="modal-body" id="lista-avisos"></div></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -122,7 +123,7 @@ function getEstiloDisciplina(nome){
   if(n.includes('ciencias')) return {cor:'#F1F8E9', corIconBg:'#DCEDC8', corIcon:'#33691E', icon:'fa-flask'};
   return {cor:'#E8EAF6', corIconBg:'#C5CAE9', corIcon:'#283593', icon:'fa-book'};
 }
-async function registrarAcessoAnalytics(t){try{if(sessionStorage.getItem('aluno_access_counted_this_session')==='true') return;const uid=auth.currentUser.uid;const user=auth.currentUser;const hoje=new Date();const dia=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;const mes=dia.substring(0,7);const ano=String(hoje.getFullYear());const semana=getSemanaISO(dia);await addDoc(collection(db,'analytics_access'),{userId:uid,email:user.email||'',nome:dadosAlunoGlobal?.nome||user.displayName||'',tipo_usuario:t,serie:dadosAlunoGlobal?.serie||'',turno:dadosAlunoGlobal?.turno||'',dia,mes,ano,semana,data:Timestamp.now(),criadoEm:serverTimestamp()});sessionStorage.setItem('aluno_access_counted_this_session','true')}catch(e){}}
+async function registrarAcessoAnalytics(t){try{if(sessionStorage.getItem('aluno_access_counted_this_session')==='true') return;const uid=auth.currentUser.uid;const user=auth.currentUser;const hoje=new Date();const dia=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;const mes=dia.substring(0,7);const ano=String(hoje.getFullYear());const semana=getSemanaISO(dia);await addDoc(collection(db,'analytics_access'),{userId:uid,email:user.email||'',nome:dadosAlunoGlobal?.nome||user.displayName||'',tipo_usuario:t,serie:dadosAlunoGlobal?.serie||'',turno:dadosAlunoGlobal?.turno||'',dia,mes,ano,semana,data:Timestamp.now(),createdAt:serverTimestamp()});sessionStorage.setItem('aluno_access_counted_this_session','true')}catch(e){}}
 document.getElementById('data-hoje').textContent=formatarData();
 window.logout=()=>{sessionStorage.removeItem('aluno_access_counted_this_session');signOut(auth).then(()=>{window.location.href='index.html'})};
 window.abrirProvas=()=>{document.getElementById('modal-provas').classList.add('ativo');carregarProvasDoCache()};
@@ -130,13 +131,14 @@ window.fecharProvas=()=>{document.getElementById('modal-provas').classList.remov
 window.abrirAvisos=async()=>{document.getElementById('modal-avisos').classList.add('ativo');await carregarAvisosDoCache()};
 window.fecharAvisos=()=>{document.getElementById('modal-avisos').classList.remove('ativo')};
 async function carregarTudoUnificado(serie, turno){
-  const grid=document.getElementById('grid-tarefas');const barra=document.getElementById('barra-caderno-leitura');
-  const txtCaderno=document.getElementById('texto-caderno-paginas');const txtImpressa=document.getElementById('texto-tarefa-impressa');
-  const dataHoje=formatarDataFirebase();const turnoLimpo=turno.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-
-  // REGRA QUE VOCÊ PEDIU: SÓ MOSTRA CADERNO E IMPRESSA SE FOR JARDIM
+  const grid=document.getElementById('grid-tarefas');
+  const barra=document.getElementById('barra-caderno-leitura');
+  const boxCaderno=document.getElementById('box-caderno');
+  const boxImpressa=document.getElementById('box-impressa');
+  const txtCaderno=document.getElementById('texto-caderno-paginas');
+  const dataHoje=formatarDataFirebase();
+  const turnoLimpo=turno.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
   const ehJardim = (serie||'').toUpperCase().includes('JARDIM');
-
   const q = query(collection(db,'agendas'), where('serie','==',serie), where('turno','==',turnoLimpo), limit(150));
   const snap = await getDocs(q);cacheAgendas=[]; snap.forEach(d=>{cacheAgendas.push({id:d.id,...d.data()})});
   const tarefasHoje = cacheAgendas.filter(a=>a.tipo==='tarefa' && a.data===dataHoje);
@@ -162,13 +164,26 @@ async function carregarTudoUnificado(serie, turno){
     });
     grid.innerHTML=html;
 
-    // AQUI ESTÁ O PULO DO GATO
+    // *** UNICA LOGICA ALTERADA - CADERNO E IMPRESSA ***
     if(ehJardim){
-      if(temLei){let u=[...new Set(paginas.join(' • ').split(' • ').map(s=>s.trim()).filter(Boolean))];txtCaderno.textContent=u.length?`Página ${u.join(' • ')}`:'Sim';txtCaderno.className='pill pill-sim';}else{txtCaderno.textContent='Não';txtCaderno.className='pill pill-nao';}
-      txtImpressa.textContent=temImp?'Sim':'Não';txtImpressa.className=temImp?'pill pill-sim':'pill pill-nao';
-      barra.classList.add('show');
+      if(temLei || temImp){
+        if(temLei){
+          let u=[...new Set(paginas.join(' • ').split(' • ').map(s=>s.trim()).filter(Boolean))];
+          txtCaderno.textContent=u.length?`Página ${u.join(' • ')}`:'Sim';
+          boxCaderno.style.display='flex';
+        } else {
+          boxCaderno.style.display='none';
+        }
+        if(temImp){
+          boxImpressa.style.display='flex';
+        } else {
+          boxImpressa.style.display='none';
+        }
+        barra.classList.add('show');
+      } else {
+        barra.classList.remove('show');
+      }
     } else {
-      // FUNDAMENTAL: ESCONDE SEMPRE
       barra.classList.remove('show');
     }
   }
@@ -329,19 +344,22 @@ window.gerarPDFTarefasSemana=async()=>{
     doc.setFillColor(107,125,140);doc.roundedRect(12,y,186,8,2,2,'F');
     doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.text(`${nomeDia.toUpperCase()} - ${dataBr}`,15,y+5.2);
     doc.setFontSize(6);doc.setFont('helvetica','normal');doc.text(`${lista.length} tarefa(s)`,195,y+5.2,{align:'right'});y+=10;
-
     const ehJardimPDF = (dadosAlunoGlobal.serie||'').toUpperCase().includes('JARDIM');
-    if(ehJardimPDF){
+    if(ehJardimPDF && (temLei || temImp)){
       doc.setFillColor(255,255,255);doc.setDrawColor(100,100,100);doc.setLineWidth(0.25);doc.roundedRect(12,y,186,9,2,2,'FD');
-      doc.setFont('helvetica','bold');doc.setFontSize(6);doc.setTextColor(40,40,40);doc.text('CADERNO DE LEITURA',15,y+5.5);
-      let wC=doc.getTextWidth(txtCaderno)+6; doc.setFillColor(214,232,208);doc.setDrawColor(180,210,180);doc.roundedRect(46,y+1.5,wC,6,2,2,'FD');doc.setTextColor(26,61,40);doc.setFontSize(6);doc.text(txtCaderno,48,y+5.2);
-      doc.setTextColor(40,40,40);doc.text('TAREFA IMPRESSA',140,y+5.5);
-      let wI=doc.getTextWidth(txtImp)+6; let xI=194-wI;
-      if(temImp){doc.setFillColor(209,240,216);doc.setDrawColor(168,216,176);}else{doc.setFillColor(255,224,224);doc.setDrawColor(255,180,180);}
-      doc.roundedRect(xI,y+1.5,wI,6,2,2,'FD');doc.setTextColor(temImp?22:185,temImp?101:28,temImp?52:28);doc.text(txtImp,xI+3,y+5.2);
+      doc.setFont('helvetica','bold');doc.setFontSize(6);doc.setTextColor(40,40,40);
+      if(temLei){
+        doc.text('CADERNO DE LEITURA',15,y+5.5);
+        let wC=doc.getTextWidth(txtCaderno)+6; doc.setFillColor(214,232,208);doc.setDrawColor(180,210,180);doc.roundedRect(46,y+1.5,wC,6,2,2,'FD');doc.setTextColor(26,61,40);doc.setFontSize(6);doc.text(txtCaderno,48,y+5.2);
+      }
+      if(temImp){
+        doc.setTextColor(40,40,40);doc.text('TAREFA IMPRESSA',140,y+5.5);
+        let wI=doc.getTextWidth('Sim')+6; let xI=194-wI;
+        doc.setFillColor(209,240,216);doc.setDrawColor(168,216,176);
+        doc.roundedRect(xI,y+1.5,wI,6,2,2,'FD');doc.setTextColor(22,101,52);doc.text('Sim',xI+3,y+5.2);
+      }
       y+=14;
     }
-
     let cardsPos=[];
     let yAtual = y;
     let idx=0;
