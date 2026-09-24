@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arquivados - Marito Dutra</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+    body{background:linear-gradient(135deg,#7fffd4 0%,#1abc9c 100%);padding:20px;min-height:100vh;font-size:14px}
+ .container{max-width:1150px;margin:0 auto}
+ .header{background:#fff;padding:12px 18px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+ .header h2{color:#e67e22; display:flex; align-items:center; gap:8px}
+ .header-actions{display:flex; gap:8px; flex-wrap:wrap}
+ .btn{padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;transition:0.2s}
+ .btn-voltar{background:#fff; color:#036618; border:1.5px solid #036618}
+ .btn-voltar:hover{background:#e8f8f3}
+ .btn-sair{background:#fff; color:#e74c3c; border:1.5px solid #e74c3c}
+ .btn-sair:hover{background:#fdecea}
+ .tabs{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+ .tab{padding:10px 20px;border-radius:20px;border:none;cursor:pointer;font-weight:bold;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.1); display:flex; align-items:center; gap:6px}
+ .tab.ativo{background:#036618;color:#fff}
+ .filtros{background:#fff;padding:12px 15px;border-radius:10px;display:flex;gap:12px;align-items:flex-end;margin-bottom:15px;box-shadow:0 2px 5px rgba(0,0,0,.1);flex-wrap:wrap}
+ .filtro-item{display:flex;flex-direction:column}
+ .filtro-item label{font-weight:800;color:#036618;font-size:11px;margin-bottom:3px;display:flex;align-items:center;gap:4px}
+ .filtros select,.filtros input{padding:8px 12px;border-radius:6px;border:1px solid #ccc;min-width:160px;font-weight:600;font-size:13px}
+ .filtro-nome input{min-width:220px}
+ .tabela-container{background:#fff;padding:18px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,.1);overflow-x:auto; position:relative; min-height:200px}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th{background:#036618;color:#fff;padding:10px;text-align:left;white-space:nowrap}
+    td{padding:10px;border-bottom:1px solid #eee}
+ .foto{width:36px;height:36px;border-radius:50%;object-fit:cover}
+ .acoes{display:flex;gap:6px;justify-content:center}
+ .btn-acao{border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px}
+ .btn-reativar{background:#2ecc71;color:#fff}
+    #loader{position:absolute;top:0; left:0; width:100%; height:100%;background:rgba(255,255,255,0.9);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;z-index:10;border-radius:10px;}
+    #loader.hidden{display:none}
+ .spinner{width:48px; height:48px;border:5px solid #d1f2e5;border-top:5px solid #036618;border-radius:50%;animation: spin 0.9s linear infinite;}
+    @keyframes spin{ to{ transform:rotate(360deg) } }
+ .loader-text{ color:#036618; font-weight:800; font-size:14px }
+ .paginacao{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:20px;padding-top:15px}
+ .btn-pag{padding:7px 13px;border:none;background:#f5f5f5;color:#666;border-radius:5px;cursor:pointer;font-weight:600;font-size:13px; min-width:36px}
+ .btn-pag:hover{background:#e0e0e0}
+ .btn-pag:disabled{opacity:.3;cursor:not-allowed}
+ .btn-pag.ativo{background:#036618;color:#fff;box-shadow:0 2px 5px rgba(0,0,0,.2)}
+ .badge-turno{padding:3px 8px;border-radius:12px;font-size:11px;font-weight:800;color:#fff}
+ .turno-manha{background:#3498db}.turno-tarde{background:#e67e22}.turno-noite{background:#2c3e50}.turno-integral{background:#8e44ad}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h2><i class="fa-solid fa-box-archive"></i> Central de Arquivados</h2>
+    <div class="header-actions">
+      <button class="btn btn-voltar" onclick="window.location.href='cad_aluno_prof.html'"><i class="fa-solid fa-arrow-left"></i> Voltar ao Painel</button>
+      <button class="btn btn-sair" id="logout-button"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab ativo" id="tab-alunos" onclick="trocarAba('alunos')"><i class="fa-solid fa-user-graduate"></i> Alunos (<span id="count-alunos">0</span>)</button>
+    <button class="tab" id="tab-prof" onclick="trocarAba('professores')"><i class="fa-solid fa-chalkboard-user"></i> Professores (<span id="count-prof">0</span>)</button>
+  </div>
+
+  <div class="filtros">
+    <div class="filtro-item filtro-nome">
+      <label><i class="fa-solid fa-magnifying-glass"></i> Buscar por Nome</label>
+      <input type="text" id="filtro-nome" placeholder="Digite o nome..." oninput="filtrar()">
+    </div>
+
+    <div class="filtro-item">
+      <label><i class="fa-solid fa-filter"></i> Série/Matéria:</label>
+      <select id="filtro-serie" onchange="filtrar()"><option value="">Todas</option></select>
+    </div>
+
+    <div class="filtro-item">
+      <label><i class="fa-solid fa-clock"></i> Turno:</label>
+      <select id="filtro-turno" onchange="filtrar()">
+        <option value="">Todos os turnos</option>
+        <option value="manha">Manhã</option>
+        <option value="tarde">Tarde</option>
+      </select>
+    </div>
+    <span id="contador-filtro" style="margin-left:auto;color:#666;font-weight:700;font-size:12px"></span>
+  </div>
+
+  <div class="tabela-container">
+    <div id="loader">
+      <div class="spinner"></div>
+      <div class="loader-text"><i class="fa-solid fa-box-archive"></i> Carregando arquivados...</div>
+    </div>
+
+    <table id="tabela">
+      <thead><tr><th>Foto</th><th>Nome</th><th>Info</th><th>Email</th><th>Turno</th><th>Arquivado em</th><th style="text-align:center">Ações</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div id="paginacao" class="paginacao"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = { apiKey: "AIzaSyDJnKktnaupmHUwL-jZHIeionowOb6Egrg", authDomain: "agenda-escolar-19fda.firebaseapp.com", projectId: "agenda-escolar-19fda", storageBucket: "agenda-escolar-19fda.firebasestorage.app", messagingSenderId: "460998217684", appId: "1:460998217684:web:98e4a2cc23b467124bd041" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let abaAtual = 'alunos';
+let cacheAlunos = [];
+let cacheProf = [];
+let filtroSerie = '';
+let filtroTurno = '';
+let filtroNome = '';
+let paginaAtual = 1;
+const itensPorPagina = 6;
+
+const loader = document.getElementById('loader');
+function mostrarLoader(t='Carregando...'){ loader.querySelector('.loader-text').innerHTML = `<i class="fa-solid fa-box-archive"></i> ${t}`; loader.classList.remove('hidden'); }
+function esconderLoader(){ loader.classList.add('hidden'); }
+
+onAuthStateChanged(auth, u => { if(!u) location.href='admin.html'; else carregarTudo(); });
+
+async function carregarTudo(){
+  mostrarLoader();
+  try{
+    const [snapAlunos, snapProf] = await Promise.all([ getDocs(collection(db, "alunos")), getDocs(collection(db, "professores")) ]);
+    cacheAlunos = []; cacheProf = [];
+    snapAlunos.forEach(d=>{ const st=d.data().status; if(st==='inativo'||st==='arquivado') cacheAlunos.push({id:d.id,...d.data()}); });
+    snapProf.forEach(d=>{ const st=d.data().status; if(st==='inativo'||st==='arquivado') cacheProf.push({id:d.id,...d.data()}); });
+    document.getElementById('count-alunos').textContent = cacheAlunos.length;
+    document.getElementById('count-prof').textContent = cacheProf.length;
+    paginaAtual = 1; filtroSerie=''; filtroTurno=''; filtroNome='';
+    document.getElementById('filtro-serie').value=''; document.getElementById('filtro-turno').value=''; document.getElementById('filtro-nome').value='';
+    atualizarFiltroSerie();
+    render();
+  }catch(e){ document.querySelector('#tabela tbody').innerHTML = `<tr><td colspan="7" style="color:#e74c3c;text-align:center">Erro: ${e.message}</td></tr>`; }
+  finally{ esconderLoader(); }
+}
+
+window.trocarAba = (aba) => {
+  abaAtual = aba;
+  paginaAtual = 1; filtroSerie=''; filtroTurno=''; filtroNome='';
+  document.getElementById('filtro-serie').value=''; document.getElementById('filtro-turno').value=''; document.getElementById('filtro-nome').value='';
+  document.getElementById('tab-alunos').classList.toggle('ativo', aba==='alunos');
+  document.getElementById('tab-prof').classList.toggle('ativo', aba==='professores');
+  atualizarFiltroSerie();
+  render();
+}
+
+window.filtrar = () => {
+  filtroSerie = document.getElementById('filtro-serie').value;
+  filtroTurno = document.getElementById('filtro-turno').value;
+  filtroNome = document.getElementById('filtro-nome').value.toLowerCase().trim();
+  paginaAtual = 1;
+  render();
+}
+
+function atualizarFiltroSerie(){
+  const select = document.getElementById('filtro-serie');
+  const lista = abaAtual==='alunos'? cacheAlunos : cacheProf;
+  const campo = abaAtual==='alunos'? 'serie' : 'materia';
+  const unicos = [...new Set(lista.map(i => (i[campo]||'').trim()).filter(v=>v!==''))].sort();
+  const valorAtual = select.value;
+  if(abaAtual==='alunos') select.innerHTML = '<option value="">Todas as séries</option>';
+  else select.innerHTML = '<option value="">Todas as matérias</option>';
+  unicos.forEach(v=>{ const opt=document.createElement('option'); opt.value=v; opt.textContent=v; select.appendChild(opt); });
+  if(valorAtual) select.value=valorAtual;
+}
+
+function getListaFiltrada(){
+  let lista = abaAtual==='alunos'? cacheAlunos : cacheProf;
+  if(filtroNome){
+    lista = lista.filter(item => (item.nome||'').toLowerCase().includes(filtroNome));
+  }
+  if(filtroSerie) lista = lista.filter(item => ((item.serie||'')+' '+(item.materia||'')).toLowerCase().includes(filtroSerie.toLowerCase()));
+  if(filtroTurno) lista = lista.filter(item => (item.turno||'').toLowerCase() === filtroTurno.toLowerCase());
+  return lista;
+}
+
+function corTurno(turno){
+  const t=(turno||'').toLowerCase();
+  if(t.includes('manhã')||t.includes('manha')) return 'turno-manha';
+  if(t.includes('tarde')) return 'turno-tarde';
+  if(t.includes('noite')) return 'turno-noite';
+  if(t.includes('integral')) return 'turno-integral';
+  return 'turno-manha';
+}
+
+function render(){
+  const tbody = document.querySelector('#tabela tbody');
+  const lista = getListaFiltrada();
+  tbody.innerHTML = '';
+  document.getElementById('contador-filtro').textContent = (filtroSerie||filtroTurno||filtroNome)? `${lista.length} encontrado(s)` : '';
+  if(lista.length===0){
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:#888"><i class="fa-solid fa-inbox" style="font-size:22px; display:block; margin-bottom:8px"></i>Nenhum ${abaAtual} arquivado</td></tr>`;
+    document.getElementById('paginacao').innerHTML = ''; return;
+  }
+  const totalPaginas = Math.ceil(lista.length / itensPorPagina);
+  if(paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+  const inicio = (paginaAtual - 1) * itensPorPagina;
+  const paginaItens = lista.slice(inicio, inicio + itensPorPagina);
+  paginaItens.forEach(dados=>{
+    const data = dados.data_arquivado? new Date(dados.data_arquivado).toLocaleDateString('pt-BR') : '-';
+    const info = abaAtual==='alunos'? (dados.serie||'-') : (dados.materia||dados.serie||'Professor');
+    const turno = dados.turno||'-';
+    const badge = turno==='-'? '-' : `<span class="badge-turno ${corTurno(turno)}">${turno}</span>`;
+    tbody.innerHTML += `
+      <tr>
+        <td><img src="${dados.foto||'./img/aluna.png'}" class="foto"></td>
+        <td>${dados.nome||'-'}</td>
+        <td>${info}</td>
+        <td>${dados.email||'-'}</td>
+        <td>${badge}</td>
+        <td>${data}</td>
+        <td><div class="acoes"><button class="btn-acao btn-reativar" onclick="reativar('${dados.id}')"><i class="fa-solid fa-rotate-left"></i> Reativar</button></div></td>
+      </tr>`;
+  });
+  renderPaginacao(totalPaginas);
+}
+
+function renderPaginacao(totalPaginas){
+  const div = document.getElementById('paginacao');
+  if(totalPaginas <= 1){ div.innerHTML = ''; return; }
+  let html = `<button class="btn-pag" ${paginaAtual===1?'disabled':''} onclick="mudarPagina(${paginaAtual-1})">Anterior</button>`;
+  for(let i=1; i<=totalPaginas; i++){ html += `<button class="btn-pag ${i===paginaAtual?'ativo':''}" onclick="mudarPagina(${i})">${i}</button>`; }
+  html += `<button class="btn-pag" ${paginaAtual===totalPaginas?'disabled':''} onclick="mudarPagina(${paginaAtual+1})">Próximo</button>`;
+  div.innerHTML = html;
+}
+
+window.mudarPagina = (nova) => { paginaAtual = nova; render(); window.scrollTo({top:0, behavior:'smooth'}); }
+
+window.reativar = async (id) => {
+  const c = await Swal.fire({title:'Reativar?', text:`Esse ${abaAtual.slice(0,-1)} vai voltar para os ativos.`, icon:'question', showCancelButton:true, confirmButtonColor:'#2ecc71', confirmButtonText:'Sim, reativar'});
+  if(c.isConfirmed){
+    mostrarLoader('Reativando...');
+    try{ await updateDoc(doc(db, abaAtual, id), { status:'ativo', data_reativado: new Date().toISOString(), data_arquivado: null }); Swal.fire('Reativado!','Voltou para os ativos.','success'); await carregarTudo(); }
+    catch(e){ Swal.fire('Erro', e.message, 'error'); }
+    finally{ esconderLoader(); }
+  }
+}
+
+document.getElementById('logout-button').addEventListener('click', async ()=>{
+  const r = await Swal.fire({title:'Sair?', showCancelButton:true, confirmButtonText:'Sim'});
+  if(r.isConfirmed) signOut(auth).then(()=>{localStorage.clear(); location.href='admin.html'});
+});
+</script>
+</body>
+</html>

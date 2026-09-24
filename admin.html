@@ -3,37 +3,128 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Super Usuário</title>
+  <title>Login Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    body { font-family: Arial, sans-serif; background-color: aquamarine; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    .login-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
-    input { width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
-    button { width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    body { 
+      font-family: Arial, sans-serif; 
+      background-color:aquamarine; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      margin: 0;
+    }
+    .login-container { 
+      background: white; 
+      padding: 25px; 
+      border-radius: 8px; 
+      box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+      width: 320px; 
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .login-container label {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .login-container input[type="email"],
+    .login-container input[type="password"],
+    .login-container input[type="text"] {
+      width: 100%; 
+      padding: 12px; 
+      margin: 8px 0 15px 0; 
+      border: 1px solid #ddd; 
+      border-radius: 6px;
+      font-size: 15px;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .login-container input:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 3px rgba(76,175,80,0.3);
+    }
+    button { 
+      width: 100%; 
+      padding: 12px; 
+      background: #4CAF50; 
+      color: white; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 16px;
+      font-weight: bold;
+    }
     button:hover { background: #45a049; }
-    .esqueci-senha { text-align: right; font-size: 12px; margin-top: 8px; }
-    .esqueci-senha a { color: #4CAF50; text-decoration: none; }
-    #login-message { margin-top: 10px; text-align: center; }
+    #login-message { margin-top: 10px; text-align: center; font-size: 14px; }
+    #forgot-password-admin { text-align: center; margin-top: 12px; }
+    #forgot-password-admin a { color: #4CAF50; text-decoration: none; font-size: 13px; }
+    #forgot-password-admin a:hover { text-decoration: underline; }
+
+    /* OLHINHO DISCRETO */
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    .password-wrapper input {
+      padding-right: 40px;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      width: 20px;
+      height: 20px;
+      opacity: 0.6;
+      transition: 0.2s;
+    }
+    .toggle-password:hover {
+      opacity: 1;
+    }
+    .toggle-password svg {
+      width: 100%;
+      height: 100%;
+      fill: #555;
+    }
   </style>
 </head>
 <body>
   <div class="login-container">
-    <h2>Login Super Usuário</h2>
-    <form id="login-form">
-      <label>Usuário:</label>
-      <input type="text" id="email" required>
+    <h2>Login Admin</h2>
+    <form id="admin-login-form">
+      <label>Email:</label>
+      <input type="email" id="admin-email" placeholder="admin@escola.com" required>
+      
       <label>Senha:</label>
-      <input type="password" id="password" required>
-      <button type="submit" id="login-button">Entrar</button>
+      <div class="password-wrapper">
+        <input type="password" id="admin-senha" placeholder="Digite sua senha" required>
+        <span class="toggle-password" data-target="admin-senha">
+          <!-- OLHO ABERTO -->
+          <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+          <!-- OLHO FECHADO -->
+          <svg class="eye-closed" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.81l-2.44-2.44C14.5 11.16 14.75 10.6 14.75 10c0-1.66-1.34-3-3-3-.6 0-1.16.25-1.56.65l-2.44-2.44C8.74 4.13 10.35 4 12 4c7 0 11 7 11 7s-1.5 3.5-4.25 5.76L17.3 18.3C19.5 16.9 21 14.7 21 12c0-7-4-7-9-7zm2.76 3.24l-1.77 1.77.77.77c.67-.66 1.11-1.53 1.24-2.49l.76-.05zm-3.29 3.29c-.45.43-1.04.7-1.71.7-1.66 0-3-1.34-3-3 0-.67.27-1.26.7-1.71l-1.42-1.42C3.55 7.9 2 9.68 2 12s4 7 10 7c1.59 0 3.07-.45 4.26-1.19L17.8 13.8c-1.07 1.28-2.79 2.2-4.8 2.2-1.27 0-2.39-.35-3.37-.93l-1.46 1.46C9.06 16.73 10.45 17 12 17c4 0 8-3 8-5 0-.72-.23-1.39-.63-1.96l-2.06 2.06c.18.53.29 1.09.29 1.7 0 1.66-1.34 3-3 3-.47 0-.91-.11-1.31-.29L15.5 13.5z"/>
+            <path d="M2 4.27l2.28 2.28.45.45C3.08 8.3 1.78 10 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27z"/>
+          </svg>
+        </span>
+      </div>
+
+      <button type="submit">Entrar</button>
       <div id="login-message"></div>
     </form>
-    <div class="esqueci-senha">
-      <a href="#">Esqueci a senha</a>
-    </div>
+     <p id="forgot-password-admin"><a href="#" class="esqueci-senha">Esqueceu a senha?</a></p>       
   </div>
 
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";                                                   
+  import { getFirestore, doc, getDoc, getDocs, query, collection, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";                                                          
+  import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDJnKktnaupmHUwL-jZHIeionowOb6Egrg",
@@ -44,29 +135,128 @@
     appId: "1:460998217684:web:98e4a2cc23b467124bd041",
     measurementId: "G-RL4NVD2Y1C"
   };
-
+  
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-  document.getElementById('login-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const messageDiv = document.getElementById('login-message');
-
-    
-    signInWithEmailAndPassword(auth, email, password)
-  .then((userCredential) => {
-    messageDiv.style.color = 'green';
-    messageDiv.textContent = 'Logado com sucesso!';
-    window.location.href = 'cad_aluno_prof.html';
-  })
-  .catch((error) => {
-    messageDiv.style.color = 'red';
-    messageDiv.textContent = 'Usuario ou senha Incorreto';
+  // FUNÇÃO DO OLHINHO
+  document.querySelectorAll('.toggle-password').forEach(item => {
+    item.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      const eyeOpen = this.querySelector('.eye-open');
+      const eyeClosed = this.querySelector('.eye-closed');
+      
+      if (input.type === "password") {
+        input.type = "text";
+        eyeOpen.style.display = "none";
+        eyeClosed.style.display = "block";
+      } else {
+        input.type = "password";
+        eyeOpen.style.display = "block";
+        eyeClosed.style.display = "none";
+      }
+    });
   });
+
+  document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('admin-email').value;
+    const senha = document.getElementById('admin-senha').value;
+    const msg = document.getElementById('login-message');
+    msg.textContent = '';
+    
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, senha);
+      const user = userCredential.user;
+
+      const adminRef = doc(db, 'superadmins', user.uid);
+      const adminDoc = await getDoc(adminRef);
+
+      if (!adminDoc.exists()) {
+        msg.style.color = 'red';
+        msg.textContent = 'Cadastro de admin não encontrado';
+        await signOut(auth);
+        return;
+      }
+
+      const tipo = adminDoc.data().tipo_usuario;
+      if (tipo !== 'admin') {
+        msg.style.color = 'red';
+        msg.textContent = 'Você não tem permissão para acessar essa área';
+        await signOut(auth);
+        return;
+      }
+
+      localStorage.setItem('uid', user.uid);
+      localStorage.setItem('nomeAdmin', adminDoc.data().email);
+      window.location.href = 'cad_aluno_prof.html';
+      
+    } catch (error) {
+      msg.style.color = 'red';
+      if (error.code === 'auth/user-not-found') {
+        msg.textContent = 'Usuário não encontrado';
+      } else if (error.code === 'auth/wrong-password') {
+        msg.textContent = 'Senha incorreta';
+      } else {
+        console.error('Erro:', error);
+        msg.textContent = 'Erro ao autenticar';
+      }
+    }
+  });
+
+  // ESQUECEU A SENHA
+  document.getElementById('forgot-password-admin').addEventListener('click', async (e) => {
+    e.preventDefault();
+    
+    const { value: email } = await Swal.fire({
+      title: 'Recuperar senha Admin',
+      input: 'email',
+      inputLabel: 'Digite seu email de administrador',
+      inputPlaceholder: 'admin@escola.com',
+      confirmButtonText: 'Enviar link',
+      confirmButtonColor: '#4CAF50',
+      cancelButtonText: 'Cancelar',
+      showCancelButton: true,
+      inputValidator: (value) => {
+        if (!value) {
+          return ' digite um email valido!';
+        }
+      }
+    });
+
+    if (!email) return;
+
+    Swal.fire({title: 'Verificando...', didOpen: () => Swal.showLoading(), allowOutsideClick: false, showConfirmButton: false});
+    
+    try {
+      await sendPasswordResetEmail(auth, email.trim());
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Enviado!',
+        text: 'Link de recuperação enviado. Checa teu email e o spam',
+        confirmButtonColor: '#4CAF50'
+      });
+      
+    } catch (error) {
+      console.log(error);
+      let msgErro = 'Erro ao enviar email. Tenta de novo';
+      if (error.code === 'auth/user-not-found') {
+        msgErro = 'Email não existe no Firebase Auth';
+      } else if (error.code === 'auth/invalid-email') {
+        msgErro = 'Email inválido';
+      }
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Deu ruim',
+        text: msgErro,
+        confirmButtonColor: '#4CAF50'
+      });
+    }
   });
 </script>
-
 </body>
 </html>

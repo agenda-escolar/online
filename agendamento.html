@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendamentos - Instituto Marito Dutra</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --verde-header: #B8E6D1; --verde-escuro: #1A4D2E; --verde-claro: #C5E1DA; --cinza-bg: #f0f2f5; --sombra: 0 4px 12px rgba(0,0,0,0.08); --borda: #e2e8f0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--cinza-bg); font-family: 'Segoe UI', system-ui, sans-serif; color: #2d3748; line-height: 1.6; }
+  .header-app { background: var(--verde-header); padding: 16px 24px; box-shadow: var(--sombra); }
+  .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .logo { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }.logo img { height: 70px; }
+  .user-info { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    #nome-professor { font-family: verdana, cursive; font-size: 22px; color: var(--verde-escuro); font-weight: bold; display: block; text-align: center; }
+    #disciplinas-professor { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; max-width: 100%; }
+    #disciplinas-professor span { background: #D6E8D6; border: 1px solid #8AA68A; color: #1A4D2E; padding: 4px 12px; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+    #logout-button { background: white; border: 2px solid var(--verde-escuro); color: var(--verde-escuro); padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: 600; transition: 0.3s; flex-shrink: 0; }
+    #logout-button:hover { background: var(--verde-escuro); color: white; }
+  .sub-header { border-radius: 8px; background: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--verde-header); max-width: 1000px; margin: 0 auto; }
+  .sub-header h1 { font-size: 18px; color: var(--verde-escuro); text-transform: uppercase; flex: 1; text-align: center; }
+  .main-container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+  .accordion-item { background: white; border-radius: 16px; box-shadow: var(--sombra); margin-bottom: 20px; overflow: hidden; border: 1px solid var(--borda); }
+  .accordion-header { padding: 20px 25px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; background: white; transition: 0.3s; }
+  .accordion-header:hover { background: #f7fafc; }.accordion-header.active { background: var(--verde-header); }
+  .accordion-header h2 { font-size: 16px; color: var(--verde-escuro); display: flex; align-items: center; gap: 12px; }
+  .accordion-header h2 i { font-size: 22px; }.accordion-header.arrow { transition: 0.3s; color: var(--verde-escuro); }
+  .accordion-header.active.arrow { transform: rotate(180deg); }
+  .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }.accordion-body.open { max-height: 2000px; }
+  .accordion-content { padding: 30px; border-top: 1px solid var(--borda); }
+  .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 10px; }
+  .form-field { display: flex; flex-direction: column; }.form-field.full { grid-column: 1 / -1; }
+  .form-field label { margin-bottom: 8px; font-size: 12px; font-weight: 700; color: #4a5568; text-transform: uppercase; }
+  .form-field label i { margin-right: 6px; color: var(--verde-escuro); }
+  .form-field input,.form-field select,.form-field textarea { padding: 12px 16px; border: 2px solid var(--borda); border-radius: 10px; font-size: 14px; background: #f7fafc; transition: 0.3s; }
+  .form-field input:focus,.form-field select:focus,.form-field textarea:focus { outline: none; border-color: var(--verde-header); background: white; }
+  .form-field textarea { min-height: 100px; resize: vertical; }
+  .form-row-2col { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .caderno-toggle-box { display: flex; align-items: center; gap: 14px; padding: 0 16px; background: #f7fafc; border: 2px solid var(--borda); border-radius: 10px; height: 48px; }
+  .caderno-toggle-box.ativo { border-color: var(--verde-header); background: white; }
+  .switch-toggle { width: 48px; height: 26px; background: #cbd5e0; border-radius: 30px; position: relative; cursor: pointer; transition: 0.3s; flex-shrink: 0; }
+  .switch-toggle.active { background: var(--verde-escuro); }.switch-toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: 0.3s; }
+  .switch-toggle.active::after { transform: translateX(22px); }.toggle-text { font-weight: 700; font-size: 13px; }
+  .caderno-paginas-wrapper { display: none; flex: 1; align-items: center; gap: 8px; }.caderno-paginas-wrapper.show { display: flex; }.caderno-paginas-wrapper input { flex: 1; }
+  .checkbox-wrapper { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #f7fafc; border: 2px solid var(--borda); border-radius: 10px; height: 48px; }
+  .action-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 25px; }
+  .btn { padding: 12px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; font-size: 14px; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+  .btn-primary { background: var(--verde-escuro); color: white; }.btn-secondary { background: var(--verde-claro); color: var(--verde-escuro); }.btn-outline { background: white; border: 2px solid var(--verde-escuro); color: var(--verde-escuro); }.btn-danger { background: #dc3545; color: white; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 10000; }.modal-overlay.active { display: flex; }
+  .modal-card { background: white; border-radius: 16px; width: 90%; max-width: 750px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }.modal-header h3 { color: var(--verde-escuro); font-size: 18px; }
+  .btn-fechar-modal { background: none; border: none; font-size: 26px; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; }.btn-fechar-modal:hover { background: #dc3545; color: white; }
+  .filtros-historico { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }.filtros-historico select,.filtros-historico input { padding: 9px; border: 2px solid #B8E6D1; border-radius: 8px; font-size: 13px; }
+  .item-historico { padding: 12px 14px; border: 1px solid var(--verde-header); border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; border-left: 4px solid var(--verde-escuro); background: white; }
+  .item-historico:hover { background: #e6f7ed; transform: translateX(3px); }
+  .paginacao { display: flex; justify-content: center; gap: 6px; margin-top: 15px; flex-wrap: wrap; }.paginacao button { width: 34px; height: 34px; border: 1px solid #B8E6D1; background: white; border-radius: 8px; cursor: pointer; font-weight: 700; }.paginacao button.ativo { background: var(--verde-escuro); color: white; }
+  .alerta-content { background: white; padding: 30px; border-radius: 16px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }.alerta-content i { font-size: 50px; margin-bottom: 15px; display: block; }.alerta-content.sucesso i { color: #28a745; }.alerta-content.erro i { color: #dc3545; }.alerta-content.aviso i { color: #ffc107; }
+    #loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(0,0,0,0.8); color: white; padding: 20px 40px; border-radius: 12px; z-index: 99999; }
+    @media (max-width: 900px) {
+    .header-content { flex-wrap: wrap; justify-content: center; }
+    .logo img { height: 55px; }
+      #nome-professor { font-size: 18px; }
+      #disciplinas-professor span { font-size: 10px; padding: 3px 10px; }
+    .form-grid { grid-template-columns: 1fr; }.form-row-2col { grid-template-columns: 1fr; }.action-buttons { grid-template-columns: 1fr; }.filtros-historico { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header-app">
+    <div class="header-content">
+      <div class="logo"><img src="./img/logo.png" alt="Logo"></div>
+      <div class="user-info">
+        <span id="nome-professor">Carregando...</span>
+        <div id="disciplinas-professor"></div>
+      </div>
+      <button id="logout-button"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </header>
+  <div class="sub-header"><h1>Agendamentos</h1></div>
+  <main class="main-container">
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion('tarefas')">
+        <h2><i class="fas fa-tasks"></i> Agendamento de Tarefas</h2><i class="fas fa-chevron-down arrow"></i>
+      </div>
+      <div class="accordion-body" id="body-tarefas">
+        <div class="accordion-content">
+          <form id="form-tarefa">
+            <div class="form-grid">
+              <div class="form-field"><label><i class="fas fa-calendar"></i> Data *</label><input type="date" id="tarefa-data" required></div>
+              <div class="form-field"><label><i class="fas fa-book"></i> Disciplina *</label><select id="tarefa-disciplina" required></select></div>
+              <div class="form-field"><label><i class="fas fa-clock"></i> Turno *</label><select id="tarefa-turno"><option value="manha">Manhã</option><option value="tarde">Tarde</option></select></div>
+              <div class="form-field"><label><i class="fas fa-book-open"></i> Livro</label><input type="text" id="tarefa-livro" placeholder="Nome do livro"></div>
+              <div class="form-field"><label><i class="fas fa-graduation-cap"></i> Série *</label><select id="tarefa-serie" required><option value="">Carregando...</option></select></div>
+              <div class="form-field" style="opacity:0; pointer-events:none;"><label>-</label></div>
+              <div class="form-row-2col" id="row-jardim-only">
+                <div class="form-field">
+                  <label><i class="fas fa-book-reader"></i> Caderno Leitura</label>
+                  <div class="caderno-toggle-box" id="box-caderno"><div class="switch-toggle" id="switch-caderno"></div><span class="toggle-text" id="text-caderno">Não</span><div class="caderno-paginas-wrapper" id="wrap-caderno"><span>Páginas:</span><input type="text" id="tarefa-paginas" placeholder="Ex: 10 a 15"></div></div>
+                </div>
+                <div class="form-field">
+                  <label><i class="fas fa-print"></i> Impressa</label>
+                  <div class="checkbox-wrapper"><input type="checkbox" id="tarefa-impressa"><span>Sim, tarefa impressa</span></div>
+                </div>
+              </div>
+              <div class="form-field full"><label><i class="fas fa-comment"></i> Observação</label><textarea id="tarefa-obs" placeholder="Digite..."></textarea></div>
+            </div>
+            <div class="action-buttons">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button>
+              <button type="reset" class="btn btn-secondary"><i class="fas fa-eraser"></i> Limpar</button>
+              <button type="button" class="btn btn-outline" onclick="abrirHistorico('tarefa')"><i class="fas fa-history"></i> Histórico</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion('provas')">
+        <h2><i class="fas fa-calendar-check"></i> Agendamento de Provas</h2><i class="fas fa-chevron-down arrow"></i>
+      </div>
+      <div class="accordion-body" id="body-provas">
+        <div class="accordion-content">
+          <form id="form-prova">
+            <div class="form-grid">
+              <div class="form-field"><label>Disciplina *</label><select id="prova-disciplina" required></select></div>
+              <div class="form-field"><label>Turno *</label><select id="prova-turno"><option value="manha">Manhã</option><option value="tarde">Tarde</option></select></div>
+              <div class="form-field"><label>Série *</label><select id="prova-serie" required></select></div>
+              <div class="form-field"><label>Data da Prova *</label><input type="date" id="prova-data" required></div>
+              <div class="form-field full"><label>Assunto *</label><textarea id="prova-assunto" placeholder="Ex: Cap 1 a 3..." required></textarea></div>
+            </div>
+            <div class="action-buttons">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button>
+              <button type="reset" class="btn btn-secondary"><i class="fas fa-eraser"></i> Limpar</button>
+              <button type="button" class="btn btn-outline" onclick="abrirHistorico('prova')"><i class="fas fa-history"></i> Lista</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion('avisos')">
+        <h2><i class="fas fa-bullhorn"></i> Avisos</h2><i class="fas fa-chevron-down arrow"></i>
+      </div>
+      <div class="accordion-body" id="body-avisos">
+        <div class="accordion-content">
+          <form id="form-aviso">
+            <div class="form-grid">
+              <div class="form-field"><label>Turno *</label><select id="aviso-turno" required><option value="manha">Manhã</option><option value="tarde">Tarde</option></select></div>
+              <div class="form-field"><label>Série *</label><select id="aviso-serie" required></select></div>
+              <div class="form-field"><label>Data Início *</label><input type="date" id="aviso-inicio" required></div>
+              <div class="form-field"><label>Data Fim *</label><input type="date" id="aviso-fim" required></div>
+              <div class="form-field full"><label>Aviso *</label><textarea id="aviso-texto" required placeholder="Digite o aviso..."></textarea></div>
+            </div>
+            <div class="action-buttons">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button>
+              <button type="reset" class="btn btn-secondary"><i class="fas fa-eraser"></i> Limpar</button>
+              <button type="button" class="btn btn-outline" onclick="abrirHistorico('aviso')"><i class="fas fa-history"></i> Lista</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="modal-historico" class="modal-overlay"><div class="modal-card"><div class="modal-header"><h3 id="historico-titulo"><i class="fas fa-history"></i> Histórico</h3><button class="btn-fechar-modal" onclick="fecharHistorico()">&times;</button></div><div class="filtros-historico"><select id="filtro-historico-serie"></select><select id="filtro-historico-disc"></select><input type="date" id="filtro-historico-data"></div><div style="display:flex; gap:8px; margin-bottom:10px;"><button class="btn btn-secondary" style="flex:1; padding:8px; font-size:12px;" onclick="limparFiltrosHistorico()"><i class="fas fa-eraser"></i> Limpar filtros</button></div><div id="historico-lista"></div><div id="historico-paginacao" class="paginacao"></div><div id="historico-info" style="text-align:center; font-size:11px; color:#666; margin-top:8px;"></div></div></div>
+  <div id="modal-editar" class="modal-overlay"><div class="modal-card" style="max-width:700px;"><div class="modal-header"><h3 id="editar-titulo">Editar</h3><button class="btn-fechar-modal" onclick="fecharEditar()">&times;</button></div><div id="editar-conteudo"></div></div></div>
+  <div id="modal-alerta" class="modal-overlay"><div class="alerta-content" id="alerta-box"><i class="fas fa-check-circle"></i><p id="alerta-msg"></p><div id="alerta-btns"></div></div></div>
+  <div id="loading">Carregando...</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, updateDoc, deleteDoc, orderBy, limit, Timestamp, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = { apiKey: "AIzaSyDJnKktnaupmHUwL-jZHIeionowOb6Egrg", authDomain: "agenda-escolar-19fda.firebaseapp.com", projectId: "agenda-escolar-19fda", storageBucket: "agenda-escolar-19fda.firebasestorage.app", messagingSenderId: "460998217684", appId: "1:460998217684:web:98e4a2cc23b467124bd041" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let dadosProfessor = null;
+let todosItens = [];
+let itensFiltrados = [];
+let listaSeriesGlobal = [];
+let tipoAtual = '';
+let paginaAtual = 1;
+const itensPorPagina = 6;
+
+function normalizar(texto){
+  if(!texto) return "";
+  return texto.toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+}
+
+window.toggleAccordion = (id) => {
+  const body = document.getElementById('body-'+id);
+  const header = body.previousElementSibling;
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.accordion-body').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('.accordion-header').forEach(h=>h.classList.remove('active'));
+  if(!isOpen){ body.classList.add('open'); header.classList.add('active'); }
+};
+
+let cadernoAtivo=false;
+const sw=document.getElementById('switch-caderno');
+const txt=document.getElementById('text-caderno');
+const wrap=document.getElementById('wrap-caderno');
+const box=document.getElementById('box-caderno');
+sw.onclick=()=>{ cadernoAtivo=!cadernoAtivo; sw.classList.toggle('active',cadernoAtivo); txt.textContent=cadernoAtivo?'Sim':'Não'; box.classList.toggle('ativo',cadernoAtivo); wrap.classList.toggle('show',cadernoAtivo); };
+
+function getDiaLocal(){ const h=new Date(); return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}-${String(h.getDate()).padStart(2,'0')}`; }
+function getSemanaISO(d){ const dt=new Date(d+'T00:00:00'); const jan4=new Date(dt.getFullYear(),0,4); const diff=(dt-jan4)/86400000; return `${dt.getFullYear()}-W${String(Math.ceil((diff+jan4.getDay()+1)/7)).padStart(2,'0')}`; }
+
+onAuthStateChanged(auth, async(user)=>{
+  if(!user){ window.location.href='index.html'; return; }
+  document.getElementById('loading').style.display='block';
+  const snap = await getDoc(doc(db,'professores',user.uid));
+  if(!snap.exists()){ window.location.href='index.html'; return; }
+  dadosProfessor = snap.data();
+
+  document.getElementById('nome-professor').textContent = `Prof. ${dadosProfessor.nome}`;
+  const discContainer = document.getElementById('disciplinas-professor');
+  discContainer.innerHTML = '';
+  (dadosProfessor.disciplinas||[]).forEach(d=>{
+    const span = document.createElement('span');
+    span.textContent = d;
+    discContainer.appendChild(span);
+  });
+
+  ['tarefa-disciplina','prova-disciplina'].forEach(id=>{
+    const sel=document.getElementById(id);
+    sel.innerHTML='<option value="">Selecione</option>';
+    dadosProfessor.disciplinas.forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; sel.appendChild(o); });
+  });
+
+  // CORREÇÃO: NÃO USA NOME FIXO, USA CAMPO TIPO DO FIREBASE COM NORMALIZAÇÃO
+  const tipoRaw = dadosProfessor.tipo || dadosProfessor.nivel || '';
+  const tipoNorm = normalizar(tipoRaw);
+  const isJardim = tipoNorm.includes('jardim');
+
+  const seriesJardim=["JARDIM I","JARDIM II","JARDIM III","JARDIM IV","JARDIM V"];
+  const seriesFund=["1° ANO","2° ANO","3° ANO","4° ANO","5° ANO","6° ANO","7° ANO","8° ANO","9° ANO"];
+  let listaSeries = isJardim? seriesJardim : seriesFund;
+  listaSeriesGlobal = listaSeries;
+
+  const rowJardim = document.getElementById('row-jardim-only');
+  if(rowJardim){ rowJardim.style.display = isJardim? 'grid' : 'none'; }
+
+  ['tarefa-serie','prova-serie','aviso-serie'].forEach(id=>{
+    const sel=document.getElementById(id);
+    if(!sel) return;
+    sel.innerHTML='<option value="">Selecione série</option>';
+    listaSeries.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
+  });
+
+  try {
+    const hoje = getDiaLocal();
+    const semana = getSemanaISO(hoje);
+    await addDoc(collection(db, 'analytics_access'), {
+      userId: user.uid,
+      nome: dadosProfessor.nome,
+      email: user.email || '',
+      tipo_usuario: 'professor',
+      tipo: 'professor',
+      serie: 'PROFESSOR',
+      turma: 'PROFESSOR',
+      dia: hoje,
+      semana: semana,
+      mes: hoje.slice(0,7),
+      ano: hoje.slice(0,4),
+      timestamp: serverTimestamp(),
+      data: serverTimestamp()
+    });
+  } catch(e) {
+    console.log('erro analytics_access professor', e);
+  }
+
+  document.getElementById('loading').style.display='none';
+  toggleAccordion('tarefas');
+});
+
+document.getElementById('logout-button').onclick=()=>{ signOut(auth).then(()=>window.location.href='index.html'); };
+
+async function salvar(tipo, dados){
+  document.getElementById('loading').style.display='block';
+  try{
+    await addDoc(collection(db,'agendas'),{
+      tipo,
+     ...dados,
+      turno: normalizar(dados.turno), // sempre salva manha/tarde normalizado
+      professorId: auth.currentUser.uid,
+      nome_professor: dadosProfessor.nome,
+      criadoEm: serverTimestamp()
+    });
+    showAlerta('Salvo com sucesso!','sucesso');
+  }
+  catch(e){ showAlerta(e.message,'erro'); } finally{ document.getElementById('loading').style.display='none'; }
+}
+
+async function verificarDuplicidade(data, serie, turno, disciplinaNova){
+  try{
+    const turnoNorm = normalizar(turno);
+    const q = query(collection(db,'agendas'), where('serie','==',serie), where('data','==',data), where('tipo','==','tarefa'));
+    const snap = await getDocs(q);
+    let temLeitura=false, temImpressa=false, disciplinas=[];
+    snap.forEach(d=>{
+      const it=d.data();
+      if(normalizar(it.turno)!== turnoNorm) return;
+      if(it.cadernoLeitura==='Sim') temLeitura=true;
+      if(it.impressa==='Sim') temImpressa=true;
+      if(it.disciplina) disciplinas.push(normalizar(it.disciplina));
+    });
+    return { temLeitura, temImpressa, disciplinaDuplicada: disciplinas.includes(normalizar(disciplinaNova)) };
+  }catch(e){ return {temLeitura:false, temImpressa:false, disciplinaDuplicada:false}; }
+}
+
+document.getElementById('form-tarefa').addEventListener('submit', async(e)=>{
+  e.preventDefault();
+  const data = document.getElementById('tarefa-data').value;
+  const serie = document.getElementById('tarefa-serie').value;
+  const turno = document.getElementById('tarefa-turno').value;
+  const disciplina = document.getElementById('tarefa-disciplina').value;
+  const querLeitura = cadernoAtivo;
+  const querImpressa = document.getElementById('tarefa-impressa').checked;
+  if(!data||!serie||!disciplina){ showAlerta('Preencha Data, Série e Disciplina','aviso'); return; }
+  const tipoNorm = normalizar(dadosProfessor.tipo || dadosProfessor.nivel || '');
+  const isJardimCheck = tipoNorm.includes('jardim');
+  const finalLeitura = isJardimCheck? querLeitura : false;
+  const finalImpressa = isJardimCheck? querImpressa : false;
+  document.getElementById('loading').style.display='block';
+  const v = await verificarDuplicidade(data, serie, turno, disciplina);
+  document.getElementById('loading').style.display='none';
+  if(v.disciplinaDuplicada){ showAlerta(`A tarefa para a disciplina ${disciplina} já foi inserida no ${serie} turno ${turno} no dia ${data.split('-').reverse().join('/')}!`,'aviso'); return; }
+  if(finalLeitura && v.temLeitura){ showAlerta(`Caderno de Leitura já foi lançado para ${serie} no dia ${data.split('-').reverse().join('/')} no turno ${turno}!`,'aviso'); return; }
+  if(finalImpressa && v.temImpressa){ showAlerta(`Tarefa Impressa já foi lançada para ${serie} no dia ${data.split('-').reverse().join('/')} no turno ${turno}!`,'aviso'); return; }
+  await salvar('tarefa',{ data, disciplina, turno, livro: document.getElementById('tarefa-livro').value, serie, impressa: finalImpressa?'Sim':'Não', cadernoLeitura: finalLeitura?'Sim':'Não', cadernoPaginas: finalLeitura?document.getElementById('tarefa-paginas').value:'', observacao: document.getElementById('tarefa-obs').value });
+  e.target.reset(); cadernoAtivo=false; sw.classList.remove('active'); txt.textContent='Não'; box.classList.remove('ativo'); wrap.classList.remove('show');
+});
+
+document.getElementById('form-prova').addEventListener('submit', async(e)=>{ e.preventDefault(); await salvar('prova',{ dataProva: document.getElementById('prova-data').value, disciplina: document.getElementById('prova-disciplina').value, turno: document.getElementById('prova-turno').value, serie: document.getElementById('prova-serie').value, assunto: document.getElementById('prova-assunto').value }); e.target.reset(); });
+document.getElementById('form-aviso').addEventListener('submit', async(e)=>{ e.preventDefault(); const ini=document.getElementById('aviso-inicio').value; const fim=document.getElementById('aviso-fim').value; if(new Date(fim) < new Date(ini)){ showAlerta('Data Fim menor que Início','erro'); return; } await salvar('aviso',{ dataInicio: Timestamp.fromDate(new Date(ini+'T00:00:00')), dataValidade: Timestamp.fromDate(new Date(fim+'T23:59:59')), turno: document.getElementById('aviso-turno').value, serie: document.getElementById('aviso-serie').value, aviso: document.getElementById('aviso-texto').value, lidos: [] }); e.target.reset(); });
+
+window.abrirHistorico = async(tipo)=>{
+  tipoAtual=tipo; paginaAtual=1;
+  document.getElementById('historico-titulo').textContent = tipo==='tarefa'?'Histórico de Tarefas':tipo==='prova'?'Provas Agendadas':'Avisos Cadastrados';
+  document.getElementById('modal-historico').classList.add('active');
+  const lista=document.getElementById('historico-lista'); lista.innerHTML='Carregando...';
+  try{
+    const q = query(collection(db,'agendas'), where('professorId','==',auth.currentUser.uid), where('tipo','==',tipo), orderBy('criadoEm','desc'), limit(100));
+    const snap = await getDocs(q); todosItens=[]; const sSet=new Set(); const dSet=new Set();
+    snap.forEach(d=>{ const it={id:d.id,...d.data()}; todosItens.push(it); sSet.add(it.serie); if(it.disciplina) dSet.add(it.disciplina); });
+    const selS=document.getElementById('filtro-historico-serie'); selS.innerHTML='<option value="todas">Todas séries</option>'; [...sSet].sort().forEach(s=>selS.innerHTML+=`<option value="${s}">${s}</option>`);
+    const selD=document.getElementById('filtro-historico-disc'); selD.innerHTML='<option value="todas">Todas disciplinas</option>'; [...dSet].sort().forEach(s=>selD.innerHTML+=`<option value="${s}">${s}</option>`);
+    selD.style.display = tipo==='aviso'?'none':'block'; document.getElementById('filtro-historico-data').value=''; aplicarFiltros();
+  }catch(e){ lista.innerHTML=`<p style="color:#dc3545;text-align:center;">${e.message}</p>`; }
+};
+
+function renderHistorico(lista){
+  const div=document.getElementById('historico-lista'); const pagDiv=document.getElementById('historico-paginacao'); const infoDiv=document.getElementById('historico-info');
+  if(lista.length===0){ div.innerHTML='<p style="text-align:center; padding:20px;">Nenhum encontrado com esses filtros.</p>'; pagDiv.innerHTML=''; infoDiv.textContent=''; return; }
+  const totalPag = Math.ceil(lista.length / itensPorPagina); if(paginaAtual > totalPag) paginaAtual = totalPag;
+  const inicio = (paginaAtual-1)*itensPorPagina; const fim = inicio + itensPorPagina; const paginaItens = lista.slice(inicio,fim);
+  let html=''; paginaItens.forEach(it=>{
+    const data = it.data || it.dataProva || (it.dataValidade? it.dataValidade.toDate().toLocaleDateString('pt-BR') : '');
+    const dataF = data.includes('-')? data.split('-').reverse().join('/') : data;
+    const titulo = it.disciplina? `${dataF} - ${it.disciplina} - ${it.serie}` : `${dataF} - ${it.serie}`;
+    const desc = it.observacao || it.assunto || it.aviso || '';
+    html+=`<div class="item-historico" onclick="abrirEditar('${it.id}')"><strong><i class="fas fa-edit"></i> ${titulo}</strong><br><small>${desc.substring(0,100)}${desc.length>100?'...':''}</small></div>`;
+  });
+  div.innerHTML=html; let pagHtml=''; for(let i=1;i<=totalPag;i++){ pagHtml+=`<button class="${i===paginaAtual?'ativo':''}" onclick="irParaPagina(${i})">${i}</button>`; } pagDiv.innerHTML=pagHtml;
+  infoDiv.textContent=`Mostrando ${inicio+1} a ${Math.min(fim,lista.length)} de ${lista.length} registros`;
+}
+window.irParaPagina = (p)=>{ paginaAtual=p; renderHistorico(itensFiltrados); };
+document.getElementById('filtro-historico-serie').onchange=()=>aplicarFiltros();
+document.getElementById('filtro-historico-disc').onchange=()=>aplicarFiltros();
+document.getElementById('filtro-historico-data').onchange=()=>aplicarFiltros();
+function aplicarFiltros(){
+  const s=document.getElementById('filtro-historico-serie').value;
+  const d=document.getElementById('filtro-historico-disc').value;
+  const dataFiltro=document.getElementById('filtro-historico-data').value;
+  let f=todosItens;
+  if(s!=='todas') f=f.filter(x=>x.serie===s);
+  if(d!=='todas') f=f.filter(x=>normalizar(x.disciplina)===normalizar(d));
+  if(dataFiltro){ f=f.filter(x=>{ const dt = x.data || x.dataProva || ''; if(dt===dataFiltro) return true; if(x.dataInicio && x.dataValidade){ const ini = x.dataInicio.toDate().toISOString().split('T')[0]; const fim = x.dataValidade.toDate().toISOString().split('T')[0]; return dataFiltro>=ini && dataFiltro<=fim; } return false; }); }
+  itensFiltrados=f; paginaAtual=1; renderHistorico(f);
+}
+window.limparFiltrosHistorico=()=>{ document.getElementById('filtro-historico-serie').value='todas'; document.getElementById('filtro-historico-disc').value='todas'; document.getElementById('filtro-historico-data').value=''; aplicarFiltros(); };
+window.fecharHistorico=()=>document.getElementById('modal-historico').classList.remove('active');
+window.abrirEditar = async(id)=>{
+  document.getElementById('loading').style.display='block';
+  const ref=doc(db,'agendas',id); const snap=await getDoc(ref); const dados=snap.data(); document.getElementById('loading').style.display='none';
+  const cont=document.getElementById('editar-conteudo'); let formHtml=''; const optionsSerie = listaSeriesGlobal.map(s => `<option value="${s}" ${dados.serie===s?'selected':''}>${s}</option>`).join('');
+  if(dados.tipo==='tarefa'){ formHtml=`<div class="form-grid"><div class="form-field"><label>Data</label><input type="date" id="edit-data" value="${dados.data}"></div><div class="form-field"><label>Série *</label><select id="edit-serie" required><option value="">Selecione</option>${optionsSerie}</select></div><div class="form-field"><label>Turno</label><select id="edit-turno"><option value="manha" ${normalizar(dados.turno)==='manha'?'selected':''}>Manhã</option><option value="tarde" ${normalizar(dados.turno)==='tarde'?'selected':''}>Tarde</option></select></div><div class="form-field full"><label>Livro</label><input type="text" id="edit-livro" value="${dados.livro||''}"></div><div class="form-field full"><label>Obs</label><textarea id="edit-obs">${dados.observacao||''}</textarea></div></div>`; }
+  else if(dados.tipo==='prova'){ formHtml=`<div class="form-grid"><div class="form-field"><label>Data</label><input type="date" id="edit-data" value="${dados.dataProva}"></div><div class="form-field"><label>Série *</label><select id="edit-serie" required><option value="">Selecione</option>${optionsSerie}</select></div><div class="form-field full"><label>Assunto</label><textarea id="edit-assunto">${dados.assunto||''}</textarea></div></div>`; }
+  else { const ini = dados.dataInicio? dados.dataInicio.toDate().toISOString().split('T')[0] : ''; const fim = dados.dataValidade? dados.dataValidade.toDate().toISOString().split('T')[0] : ''; formHtml=`<div class="form-grid"><div class="form-field"><label>Série *</label><select id="edit-serie" required><option value="">Selecione</option>${optionsSerie}</select></div><div class="form-field"><label>Turno</label><select id="edit-turno"><option value="manha" ${normalizar(dados.turno)==='manha'?'selected':''}>Manhã</option><option value="tarde" ${normalizar(dados.turno)==='tarde'?'selected':''}>Tarde</option></select></div><div class="form-field"><label>Início</label><input type="date" id="edit-ini" value="${ini}"></div><div class="form-field"><label>Fim</label><input type="date" id="edit-fim" value="${fim}"></div><div class="form-field full"><label>Aviso</label><textarea id="edit-aviso">${dados.aviso||''}</textarea></div></div>`; }
+  cont.innerHTML = formHtml + `<div class="action-buttons"><button class="btn btn-primary" onclick="salvarEdicao('${id}')"><i class="fas fa-save"></i> Salvar</button><button class="btn btn-danger" onclick="excluir('${id}')"><i class="fas fa-trash"></i> Excluir</button><button class="btn btn-secondary" onclick="fecharEditar()">Fechar</button></div>`;
+  document.getElementById('editar-titulo').textContent='Editar '+dados.tipo; document.getElementById('modal-editar').classList.add('active');
+};
+window.salvarEdicao = async(id)=>{
+  document.getElementById('loading').style.display='block'; const snap = await getDoc(doc(db,'agendas',id)); const tipo = snap.data().tipo; let upd={};
+  if(tipo==='tarefa'){ upd={ data: document.getElementById('edit-data').value, serie: document.getElementById('edit-serie').value, turno: normalizar(document.getElementById('edit-turno').value), livro: document.getElementById('edit-livro').value, observacao: document.getElementById('edit-obs').value }; }
+  if(tipo==='prova'){ upd={ dataProva: document.getElementById('edit-data').value, serie: document.getElementById('edit-serie').value, assunto: document.getElementById('edit-assunto').value }; }
+  if(tipo==='aviso'){ upd={ serie: document.getElementById('edit-serie').value, dataInicio: Timestamp.fromDate(new Date(document.getElementById('edit-ini').value+'T00:00:00')), dataValidade: Timestamp.fromDate(new Date(document.getElementById('edit-fim').value+'T23:59:59')), aviso: document.getElementById('edit-aviso').value }; }
+  await updateDoc(doc(db,'agendas',id), upd); document.getElementById('loading').style.display='none'; showAlerta('Atualizado com sucesso!','sucesso',()=>{ fecharEditar(); fecharHistorico(); abrirHistorico(tipo); });
+};
+window.excluir = async(id)=>{ showConfirm('Excluir mesmo?', async(ok)=>{ if(!ok) return; document.getElementById('loading').style.display='block'; await deleteDoc(doc(db,'agendas',id)); document.getElementById('loading').style.display='none'; showAlerta('Excluído!','sucesso',()=>{ fecharEditar(); fecharHistorico(); }); }); };
+window.fecharEditar=()=>document.getElementById('modal-editar').classList.remove('active');
+function showAlerta(msg,tipo='sucesso',cb=null){ const m=document.getElementById('modal-alerta'); const box=document.getElementById('alerta-box'); box.className='alerta-content '+tipo; let ic='fa-check-circle'; if(tipo==='erro') ic='fa-times-circle'; if(tipo==='aviso') ic='fa-exclamation-triangle'; box.querySelector('i').className='fas '+ic; document.getElementById('alerta-msg').textContent=msg; document.getElementById('alerta-btns').innerHTML=`<button class="btn btn-primary" style="margin:0 auto;">OK</button>`; m.classList.add('active'); document.querySelector('#alerta-btns button').onclick=()=>{ m.classList.remove('active'); if(cb) cb(); }; }
+function showConfirm(msg,cb){ const m=document.getElementById('modal-alerta'); const box=document.getElementById('alerta-box'); box.className='alerta-content aviso'; box.querySelector('i').className='fas fa-question-circle'; document.getElementById('alerta-msg').textContent=msg; document.getElementById('alerta-btns').innerHTML=`<div style="display:flex; gap:10px; justify-content:center;"><button class="btn btn-secondary" id="btn-nao">Não</button><button class="btn btn-danger" id="btn-sim">Sim</button></div>`; m.classList.add('active'); document.getElementById('btn-sim').onclick=()=>{ m.classList.remove('active'); cb(true); }; document.getElementById('btn-nao').onclick=()=>{ m.classList.remove('active'); cb(false); }; }
+</script>
+</body>
+</html>
