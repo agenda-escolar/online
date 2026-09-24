@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin - IEMD</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+    body{background:linear-gradient(135deg,#7fffd4 0%,#1abc9c 100%);min-height:100vh}
+    .menu{background:#fff;color:#036618;box-shadow:0 2px 10px rgba(0,0,0,0.1);padding:0 24px;}
+    .menu-topo{display:flex;justify-content:space-between;align-items:center;height:62px;gap:10px}
+    .logo-area img{width:46px;height:46px;object-fit:contain;display:block}
+    .titulo-admin{font-weight:800;font-size:19px;color:#036618;text-align:center;flex:1}
+    #logout-button{background:#e74c3c;color:#fff;border:none;padding:7px 16px;border-radius:20px;cursor:pointer;font-weight:700;font-size:13px;white-space:nowrap}
+    .menu-links{display:flex;justify-content:center;gap:28px;padding:12px 0 13px 0;border-top:1px solid #f1f1f1;flex-wrap:wrap}
+    .menu-links a{color:#036618;text-decoration:none!important;font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+    .conteudo{padding:30px 20px;text-align:center;max-width:1100px;margin:0 auto;width:100%}
+    .conteudo h2{color:#fff;font-size:32px;text-shadow:1px 1px 3px rgba(0,0,0,0.2);margin-bottom:10px}
+    .conteudo p{color:#fff;font-size:18px;margin-bottom:20px;opacity:.95}
+    .metricas{display:none;gap:20px;animation:fadeIn.3s ease}
+    .metricas.ativo{display:flex;flex-direction:column}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    .periodo{background:rgba(255,255,255,0.95);border-radius:16px;padding:22px;box-shadow:0 6px 20px rgba(0,0,0,0.15);width:100%}
+    .periodo-titulo{font-size:18px;font-weight:800;color:#036618;margin-bottom:15px;text-align:left;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .cards-periodo{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:15px}
+    .card-metrica{background:#fff;padding:20px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.08);border:1px solid #eee;text-align:left}
+    .card-metrica .top{display:flex;justify-content:space-between;align-items:center}
+    .card-metrica .titulo{color:#666;font-size:13px;font-weight:700;text-transform:uppercase}
+    .card-metrica .icone{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px}
+    .icone.aluno{background:#3498db} .icone.prof{background:#9b59b6}
+    .card-metrica .numero{color:#036618;font-size:36px;font-weight:900;margin:10px 0 14px 0}
+    .btn-detalhes{background:#036618;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;width:100%;transition:.2s}
+    .btn-detalhes:hover{background:#02a650;transform:translateY(-1px)}
+    .total-bar{background:#e8f5e9;color:#036618;border:1px solid #c8e6c9;border-radius:10px;padding:10px 16px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:13px;gap:10px;flex-wrap:wrap}
+    .total-bar b{background:#fff;border:1px solid #a5d6a7;color:#036618;padding:4px 12px;border-radius:20px;font-size:14px;font-weight:900}
+    .filtros-periodo{display:flex;gap:10px;justify-content:center;margin-top:15px;flex-wrap:wrap}
+    .btn-filtro{background:#fff;color:#036618;border:2px solid #036618;padding:8px 18px;border-radius:20px;cursor:pointer;font-weight:700;font-size:13px;transition:.2s}
+    .btn-filtro.ativo,.btn-filtro:hover{background:#036618;color:#fff}
+    .msg-vazia{background:rgba(255,255,255,0.9);padding:40px 20px;border-radius:12px;color:#036618;font-weight:600;margin-top:20px}
+    div.swal2-container{z-index:99999!important}
+    #modal-aviso-geral,#modal-detalhes{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2000;justify-content:center;align-items:center;padding:20px}
+    #modal-aviso-geral.ativo,#modal-detalhes.ativo{display:flex}
+    .modal-conteudo{background:#fff;width:100%;max-width:600px;border-radius:16px;padding:25px;max-height:90vh;overflow-y:auto;position:relative;border-left:6px solid #63e89f}
+    .modal-conteudo.detalhes{max-width:650px;border-left:6px solid #036618}
+    .btn-fechar-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:#ff4d4d;color:#fff;border:none;font-size:18px;font-weight:900;cursor:pointer}
+    .lista-avisos{margin-top:25px;text-align:left}
+    .item-aviso{background:#f8f9fa;border:1px solid #ddd;border-left:4px solid #63e89f;border-radius:8px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap; align-items:center;}
+    .btn-editar{background:#3498db;color:#fff;margin-right:3px;border:none;padding:6px 10px;border-radius:5px;cursor:pointer}
+    .btn-excluir{background:#e74c3c;color:#fff;border:none;padding:6px 10px;border-radius:5px;cursor:pointer}
+    .modal-conteudo label{display:block;text-align:left;margin:10px 0 5px;font-weight:600;color:#333;font-size:14px}
+    .modal-conteudo input,.modal-conteudo textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:15px}
+    .modal-botoes{display:flex;gap:10px;margin-top:20px}
+    .btn-salvar{flex:1;background:#036618;color:#fff;border:none;padding:12px;border-radius:8px;cursor:pointer;font-weight:bold}
+    .btn-cancelar{flex:1;background:#e0e0e0;color:#333;border:none;padding:12px;border-radius:8px;cursor:pointer;font-weight:bold}
+    .tabela-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .tabela-detalhes{width:100%;border-collapse:collapse;margin-top:15px;text-align:left;min-width:480px}
+    .tabela-detalhes th{background:#036618;color:#fff;padding:10px;font-size:12px;white-space:nowrap}
+    .tabela-detalhes td{padding:10px;border-bottom:1px solid #eee;font-size:13px}
+    .badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+    .badge.aluno{background:#3498db} .badge.prof{background:#9b59b6}
+    .qtd-destaque{background:#e8f5e9;color:#036618;padding:4px 10px;border-radius:20px;font-weight:900;font-size:13px;white-space:nowrap}
+    .badge-serie{background:#036618;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;margin-left:5px;white-space:nowrap}
+    .paginacao-detalhes{display:flex;justify-content:space-between;align-items:center;margin-top:15px;background:#f1f8f1;padding:10px;border-radius:8px;gap:10px;flex-wrap:wrap}
+    .paginacao-detalhes button{background:#036618;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px}
+    .paginacao-detalhes button:disabled{background:#ccc;cursor:not-allowed}
+    @media(max-width:768px){
+      .menu{padding:0 12px}
+      .menu-topo{height:auto;padding:10px 0;gap:8px}
+      .titulo-admin{font-size:16px}
+      .menu-links{gap:14px;padding:10px 0;justify-content:space-around}
+      .menu-links a{font-size:13px}
+      .conteudo{padding:18px 12px}
+      .conteudo h2{font-size:22px}
+      .conteudo p{font-size:15px}
+      .periodo{padding:14px;border-radius:12px}
+      .periodo-titulo{font-size:15px}
+      .cards-periodo{grid-template-columns:1fr}
+      .card-metrica .numero{font-size:30px}
+      .filtros-periodo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+      .btn-filtro{padding:10px 8px;font-size:12px;width:100%;justify-content:center}
+      .modal-conteudo{padding:18px 14px;max-width:95vw}
+      .modal-conteudo.detalhes{max-width:95vw}
+      .total-bar{font-size:12px}
+    }
+  </style>
+</head>
+<body>
+  <div class="menu">
+    <div class="menu-topo">
+      <div class="logo-area"><img src="./img/logo.png" alt="Logo"></div>
+      <div class="titulo-admin">Painel Admin</div>
+      <button id="logout-button">Sair</button>
+    </div>
+    <div class="menu-links">
+      <a href="cadastro_aluno.html"><i class="fa-solid fa-user-graduate"></i> Alunos</a>
+      <a href="cadastro_professor.html"><i class="fa-solid fa-chalkboard-teacher"></i> Professores</a>
+      <a href="arquivados.html"><i class="fa-solid fa-box-archive"></i> Arquivados</a>
+      <a id="btn-abrir-aviso"><i class="fa-solid fa-bell"></i> Avisos</a>
+      <a id="btn-visualizar-acesso"><i class="fa-solid fa-eye"></i> Acessos</a>
+    </div>
+  </div>
+  <div class="conteudo">
+    <h2>Bem-vindo, <span id="nome-admin">Admin</span>!</h2>
+    <p id="texto-inicial">Clique em Visualizar Acessos para ver os registros</p>
+    <div class="metricas" id="area-metricas">
+      <div class="periodo" id="bloco-dia">
+        <div class="periodo-titulo"><i class="fa-solid fa-calendar-day"></i> Hoje - <span id="label-hoje"></span></div>
+        <div class="cards-periodo">
+          <div class="card-metrica"><div class="top"><div class="titulo">Alunos</div><div class="icone aluno"><i class="fa-solid fa-user-graduate"></i></div></div><div class="numero" id="contador-dia-aluno">0</div><button class="btn-detalhes" onclick="verDetalhes('dia','aluno')">Ver detalhes</button></div>
+          <div class="card-metrica"><div class="top"><div class="titulo">Professores</div><div class="icone prof"><i class="fa-solid fa-chalkboard-teacher"></i></div></div><div class="numero" id="contador-dia-prof">0</div><button class="btn-detalhes" onclick="verDetalhes('dia','professor')">Ver detalhes</button></div>
+        </div>
+        <div class="total-bar"><span><i class="fa-solid fa-chart-simple"></i> TOTAL HOJE</span><span><b id="contador-dia-total">0</b> acessos</span></div>
+      </div>
+      <div class="periodo" id="bloco-semana" style="display:none">
+        <div class="periodo-titulo"><i class="fa-solid fa-calendar-week"></i> Essa Semana - <span id="label-semana"></span></div>
+        <div class="cards-periodo">
+          <div class="card-metrica"><div class="top"><div class="titulo">Alunos</div><div class="icone aluno"><i class="fa-solid fa-user-graduate"></i></div></div><div class="numero" id="contador-semana-aluno">0</div><button class="btn-detalhes" onclick="verDetalhes('semana','aluno')">Ver detalhes</button></div>
+          <div class="card-metrica"><div class="top"><div class="titulo">Professores</div><div class="icone prof"><i class="fa-solid fa-chalkboard-teacher"></i></div></div><div class="numero" id="contador-semana-prof">0</div><button class="btn-detalhes" onclick="verDetalhes('semana','professor')">Ver detalhes</button></div>
+        </div>
+        <div class="total-bar"><span><i class="fa-solid fa-chart-simple"></i> TOTAL SEMANA</span><span><b id="contador-semana-total">0</b> acessos</span></div>
+      </div>
+      <div class="periodo" id="bloco-mes" style="display:none">
+        <div class="periodo-titulo"><i class="fa-solid fa-calendar"></i> Esse Mês - <span id="label-mes"></span></div>
+        <div class="cards-periodo">
+          <div class="card-metrica"><div class="top"><div class="titulo">Alunos</div><div class="icone aluno"><i class="fa-solid fa-user-graduate"></i></div></div><div class="numero" id="contador-mes-aluno">0</div><button class="btn-detalhes" onclick="verDetalhes('mes','aluno')">Ver detalhes</button></div>
+          <div class="card-metrica"><div class="top"><div class="titulo">Professores</div><div class="icone prof"><i class="fa-solid fa-chalkboard-teacher"></i></div></div><div class="numero" id="contador-mes-prof">0</div><button class="btn-detalhes" onclick="verDetalhes('mes','professor')">Ver detalhes</button></div>
+        </div>
+        <div class="total-bar"><span><i class="fa-solid fa-chart-simple"></i> TOTAL MÊS</span><span><b id="contador-mes-total">0</b> acessos</span></div>
+      </div>
+      <div class="periodo" id="bloco-ano" style="display:none">
+        <div class="periodo-titulo"><i class="fa-solid fa-calendar-days"></i> Esse Ano - <span id="label-ano"></span></div>
+        <div class="cards-periodo">
+          <div class="card-metrica"><div class="top"><div class="titulo">Alunos</div><div class="icone aluno"><i class="fa-solid fa-user-graduate"></i></div></div><div class="numero" id="contador-ano-aluno">0</div><button class="btn-detalhes" onclick="verDetalhes('ano','aluno')">Ver detalhes</button></div>
+          <div class="card-metrica"><div class="top"><div class="titulo">Professores</div><div class="icone prof"><i class="fa-solid fa-chalkboard-teacher"></i></div></div><div class="numero" id="contador-ano-prof">0</div><button class="btn-detalhes" onclick="verDetalhes('ano','professor')">Ver detalhes</button></div>
+        </div>
+        <div class="total-bar"><span><i class="fa-solid fa-chart-simple"></i> TOTAL ANO</span><span><b id="contador-ano-total">0</b> acessos</span></div>
+      </div>
+      <div class="filtros-periodo">
+        <button class="btn-filtro ativo" id="filtro-dia" onclick="mostrarPeriodo('dia')"><i class="fa-solid fa-calendar-day"></i> Hoje</button>
+        <button class="btn-filtro" id="filtro-semana" onclick="mostrarPeriodo('semana')"><i class="fa-solid fa-calendar-week"></i> Semana</button>
+        <button class="btn-filtro" id="filtro-mes" onclick="mostrarPeriodo('mes')"><i class="fa-solid fa-calendar"></i> Mês</button>
+        <button class="btn-filtro" id="filtro-ano" onclick="mostrarPeriodo('ano')"><i class="fa-solid fa-calendar-days"></i> Ano</button>
+      </div>
+    </div>
+    <div class="msg-vazia" id="msg-vazia"><i class="fa-solid fa-chart-line"></i> Nenhum acesso visualizado.<br>Clique em Visualizar Acessos.</div>
+  </div>
+
+  <div id="modal-aviso-geral"><div class="modal-conteudo"><button class="btn-fechar-x" id="btn-x-fechar">✕</button><h3 id="titulo-modal-aviso">Adicionar Aviso Geral</h3><input type="hidden" id="aviso-id"><label>Data Início</label><input type="date" id="aviso-inicio"><label>Data Fim</label><input type="date" id="aviso-fim"><label>Mensagem</label><textarea id="aviso-msg" rows="4" placeholder="Digite o aviso..."></textarea><div class="modal-botoes"><button class="btn-salvar" id="btn-salvar-aviso">Salvar</button><button class="btn-cancelar" id="btn-fechar-aviso">Fechar</button></div><div class="lista-avisos" id="lista-avisos-geral"></div></div></div>
+  <div id="modal-detalhes"><div class="modal-conteudo detalhes"><button class="btn-fechar-x" id="btn-x-detalhes">✕</button><h3 id="titulo-detalhes">Detalhes</h3><p id="subtitulo-detalhes" style="color:#666;font-size:13px;margin-top:5px"></p><div id="lista-detalhes"></div><div class="paginacao-detalhes" id="paginacao-detalhes"></div></div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, getDocs, getDoc, query, collection, where, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig={apiKey:"AIzaSyDJnKktnaupmHUwL-jZHIeionowOb6Egrg",authDomain:"agenda-escolar-19fda.firebaseapp.com",projectId:"agenda-escolar-19fda",storageBucket:"agenda-escolar-19fda.firebasestorage.app",messagingSenderId:"460998217684",appId:"1:460998217684:web:98e4a2cc23b467124bd041"};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+onAuthStateChanged(auth,(user)=>{ if(!user) window.location.href='admin.html'; });
+
+function getDiaLocal(){ const h=new Date(); return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}-${String(h.getDate()).padStart(2,'0')}`; }
+function getSemanaISO(d){ const dt=new Date(d+'T00:00:00'); const jan4=new Date(dt.getFullYear(),0,4); const diff=(dt-jan4)/86400000; return `${dt.getFullYear()}-W${String(Math.ceil((diff+jan4.getDay()+1)/7)).padStart(2,'0')}`; }
+
+let cacheDados = { dia:[], semana:[], mes:[], ano:[] };
+let paginaAtualDetalhes = 1;
+let rankingAtual = [];
+let periodoAtualDetalhes = '';
+let tipoAtualDetalhes = '';
+
+window.mostrarPeriodo = (periodo) => {
+  document.querySelectorAll('.periodo').forEach(p=> p.style.display='none');
+  document.getElementById('bloco-'+periodo).style.display='block';
+  document.querySelectorAll('.btn-filtro').forEach(b=> b.classList.remove('ativo'));
+  document.getElementById('filtro-'+periodo).classList.add('ativo');
+}
+
+async function carregarMetricas(){
+  const hoje=getDiaLocal(), mes=hoje.slice(0,7), ano=hoje.slice(0,4), semana=getSemanaISO(hoje);
+  document.getElementById('label-hoje').innerText=hoje.split('-').reverse().join('/');
+  document.getElementById('label-semana').innerText=semana;
+  document.getElementById('label-mes').innerText=mes;
+  document.getElementById('label-ano').innerText=ano;
+  const [sDia,sSem,sMes,sAno]=await Promise.all([
+    getDocs(query(collection(db,"analytics_access"),where("dia","==",hoje))),
+    getDocs(query(collection(db,"analytics_access"),where("semana","==",semana))),
+    getDocs(query(collection(db,"analytics_access"),where("mes","==",mes))),
+    getDocs(query(collection(db,"analytics_access"),where("ano","==",ano)))
+  ]);
+  function toArray(snap){ let arr=[]; snap.forEach(d=>arr.push(d.data())); return arr; }
+  const arrDia = toArray(sDia); const arrSem = toArray(sSem); const arrMes = toArray(sMes); const arrAno = toArray(sAno);
+  function proc(lista){ let a=[],p=[]; lista.forEach(v=>{ const t=(v.tipo_usuario||'').toLowerCase(); if(t.includes('aluno')) a.push(v); else if(t.includes('prof')) p.push(v); }); return {a,p,all:lista}; }
+  const d=proc(arrDia), sem=proc(arrSem), m=proc(arrMes), an=proc(arrAno);
+  cacheDados={dia:d.all,semana:sem.all,mes:m.all,ano:an.all};
+  document.getElementById("contador-dia-aluno").innerText=d.a.length;
+  document.getElementById("contador-dia-prof").innerText=d.p.length;
+  document.getElementById("contador-dia-total").innerText=d.a.length + d.p.length;
+  document.getElementById("contador-semana-aluno").innerText=sem.a.length;
+  document.getElementById("contador-semana-prof").innerText=sem.p.length;
+  document.getElementById("contador-semana-total").innerText=sem.a.length + sem.p.length;
+  document.getElementById("contador-mes-aluno").innerText=m.a.length;
+  document.getElementById("contador-mes-prof").innerText=m.p.length;
+  document.getElementById("contador-mes-total").innerText=m.a.length + m.p.length;
+  document.getElementById("contador-ano-aluno").innerText=an.a.length;
+  document.getElementById("contador-ano-prof").innerText=an.p.length;
+  document.getElementById("contador-ano-total").innerText=an.a.length + an.p.length;
+  mostrarPeriodo('dia');
+}
+
+window.verDetalhes = (periodo, tipo) => {
+  periodoAtualDetalhes = periodo;
+  tipoAtualDetalhes = tipo;
+  paginaAtualDetalhes = 1;
+  const dados = cacheDados[periodo] || [];
+  let filtrados = dados.filter(d=>{ const t=(d.tipo_usuario||'').toLowerCase(); return tipo==='aluno' ? t.includes('aluno') : t.includes('prof'); });
+  const mapa = {};
+  filtrados.forEach(f=>{ 
+    const chave = f.userId || f.email; 
+    if(!mapa[chave]){ 
+      mapa[chave] = { 
+        nome: f.nome || f.email || 'Sem nome', 
+        email: f.email || '-', 
+        tipo: f.tipo_usuario, 
+        serie: f.serie || f.turma || (f.tipo_usuario?.toLowerCase().includes('prof') ? 'PROFESSOR' : 'SEM SÉRIE'),
+        turno: f.turno || '',
+        qtd: 0 
+      }; 
+    } 
+    mapa[chave].qtd++; 
+    if(f.serie) mapa[chave].serie = f.serie;
+    if(f.turno) mapa[chave].turno = f.turno;
+  });
+  rankingAtual = Object.values(mapa).sort((a,b)=> b.qtd - a.qtd);
+  renderDetalhesPaginado();
+}
+
+function renderDetalhesPaginado(){
+  const porPagina = 10;
+  const totalPag = Math.ceil(rankingAtual.length / porPagina) || 1;
+  if(paginaAtualDetalhes > totalPag) paginaAtualDetalhes = totalPag;
+  if(paginaAtualDetalhes < 1) paginaAtualDetalhes = 1;
+  const inicio = (paginaAtualDetalhes - 1) * porPagina;
+  const fim = inicio + porPagina;
+  const pagina = rankingAtual.slice(inicio, fim);
+  const modal=document.getElementById('modal-detalhes');
+  const qtdTotal = rankingAtual.reduce((s,u)=>s+u.qtd,0);
+  document.getElementById('titulo-detalhes').innerText = `${periodoAtualDetalhes.toUpperCase()} - ${tipoAtualDetalhes==='aluno'?'Alunos':'Professores'} (${qtdTotal} acessos)`;
+  document.getElementById('subtitulo-detalhes').innerText = `${rankingAtual.length} usuários - Página ${paginaAtualDetalhes}/${totalPag} - Ranking: quem mais acessou no topo`;
+  let html=''; 
+  if(pagina.length===0){ 
+    html=`<div style="text-align:center;padding:25px;color:#888">Nenhum acesso</div>`; 
+  } else { 
+    html=`<div class="tabela-wrap"><table class="tabela-detalhes"><tr><th>#</th><th>Nome / Série</th><th>Qtd</th><th>Tipo</th></tr>`; 
+    pagina.forEach((g,i)=>{ 
+      const posReal = inicio + i + 1;
+      const badge = g.tipo?.toLowerCase().includes('aluno') ? '<span class="badge aluno">aluno</span>' : '<span class="badge prof">prof</span>'; 
+      const serieLabel = g.tipo?.toLowerCase().includes('aluno') ? `<span class="badge-serie">${g.serie} ${g.turno}</span>` : `<span class="badge-serie">PROFESSOR</span>`;
+      const destaque = posReal===1 ? 'style="background:#fffbe6"' : '';
+      html+=`<tr ${destaque}><td><b>${posReal}º</b></td><td><b>${g.nome}</b> ${serieLabel}<br><span style="font-size:11px;color:#666">${g.email}</span></td><td><span class="qtd-destaque">${g.qtd}x</span></td><td>${badge}</td></tr>`; 
+    }); 
+    html+=`</table></div>`; 
+  }
+  document.getElementById('lista-detalhes').innerHTML=html;
+  document.getElementById('paginacao-detalhes').innerHTML = `
+    <button onclick="mudarPaginaDetalhes(-1)" ${paginaAtualDetalhes===1?'disabled':''}><i class="fa-solid fa-chevron-left"></i> Anterior</button>
+    <span style="font-size:12px;font-weight:700;color:#036618">Página ${paginaAtualDetalhes} de ${totalPag}</span>
+    <button onclick="mudarPaginaDetalhes(1)" ${paginaAtualDetalhes===totalPag?'disabled':''}>Próxima <i class="fa-solid fa-chevron-right"></i></button>
+  `;
+  modal.classList.add('ativo');
+}
+
+window.mudarPaginaDetalhes = (dir)=>{
+  paginaAtualDetalhes += dir;
+  renderDetalhesPaginado();
+}
+
+document.getElementById('btn-x-detalhes').onclick=()=>document.getElementById('modal-detalhes').classList.remove('ativo');
+document.getElementById('modal-detalhes').onclick=(e)=>{ if(e.target.id==='modal-detalhes') e.target.classList.remove('ativo'); }
+
+const btnVisualizar=document.getElementById('btn-visualizar-acesso'), area=document.getElementById('area-metricas'), msg=document.getElementById('msg-vazia'), txt=document.getElementById('texto-inicial');
+let vis=false;
+btnVisualizar.onclick=()=>{ vis=!vis; if(vis){ area.classList.add('ativo'); msg.style.display='none'; txt.innerText='Registros da plataforma - Total de acessos (cada login conta)'; btnVisualizar.innerHTML='<i class="fa-solid fa-eye-slash"></i> Ocultar'; carregarMetricas(); } else { area.classList.remove('ativo'); msg.style.display='block'; txt.innerText='Clique em Visualizar Acessos'; btnVisualizar.innerHTML='<i class="fa-solid fa-eye"></i> Visualizar Acessos'; } };
+
+const modalAv=document.getElementById('modal-aviso-geral');
+document.getElementById('btn-abrir-aviso').onclick=()=>{modalAv.classList.add('ativo');carregarAvisosGeral()};
+document.getElementById('btn-fechar-aviso').onclick=()=>{modalAv.classList.remove('ativo');limparForm()};
+document.getElementById('btn-x-fechar').onclick=()=>{modalAv.classList.remove('ativo');limparForm()};
+
+function limparForm(){
+  document.getElementById('aviso-id').value='';
+  document.getElementById('aviso-inicio').value='';
+  document.getElementById('aviso-fim').value='';
+  document.getElementById('aviso-msg').value='';
+  document.getElementById('titulo-modal-aviso').innerText='Adicionar Aviso Geral';
+}
+
+// ==== LISTA COM TEXTO CORTADO ====
+async function carregarAvisosGeral(){
+  const lista=document.getElementById('lista-avisos-geral');
+  lista.innerHTML='Carregando...';
+  const snap=await getDocs(query(collection(db,"avisos_geral"),orderBy("inicio","desc")));
+  lista.innerHTML='';
+  if(snap.empty){lista.innerHTML='<p style="text-align:center;color:#888">Nenhum aviso</p>';return;}
+  snap.forEach(d=>{
+    const av=d.data();
+    const textoCompleto = av.mensagem || '';
+    const textoCurto = textoCompleto.length > 100 ? textoCompleto.substring(0,100) + '...' : textoCompleto;
+    const div=document.createElement('div');
+    div.className='item-aviso';
+    div.innerHTML=`<div style="flex:1; min-width:0;"><div style="font-size:11px;color:#036618;font-weight:bold">${av.inicio.split('-').reverse().join('/')} até ${av.fim.split('-').reverse().join('/')}</div><div style="font-size:14px; word-break:break-word;">${textoCurto}</div></div><div style="flex-shrink:0;"><button class="btn-editar" data-id="${d.id}">Editar</button><button class="btn-excluir" data-id="${d.id}">Excluir</button></div>`;
+    lista.appendChild(div);
+  });
+  lista.querySelectorAll('.btn-editar').forEach(b=>b.onclick=()=>editarAviso(b.dataset.id));
+  lista.querySelectorAll('.btn-excluir').forEach(b=>b.onclick=()=>excluirAviso(b.dataset.id));
+}
+
+// ==== SALVAR COM MENSAGEM DE SUCESSO ====
+document.getElementById('btn-salvar-aviso').onclick=async()=>{
+  const id=document.getElementById('aviso-id').value,ini=document.getElementById('aviso-inicio').value,fim=document.getElementById('aviso-fim').value,msg=document.getElementById('aviso-msg').value.trim();
+  if(!ini||!fim||!msg){Swal.fire('Preencha tudo','Informe datas e mensagem','warning');return;}
+  try{
+    if(id){
+      await updateDoc(doc(db,"avisos_geral",id),{inicio:ini,fim, mensagem:msg});
+      await Swal.fire({icon:'success', title:'Aviso alterado com sucesso!', text:'As alterações foram salvas.', timer:2000, showConfirmButton:false});
+    }else{
+      await addDoc(collection(db,"avisos_geral"),{inicio:ini,fim,mensagem:msg,criadoEm:serverTimestamp()});
+      await Swal.fire({icon:'success', title:'Aviso inserido com sucesso!', text:'Aviso cadastrado.', timer:2000, showConfirmButton:false});
+    }
+    limparForm();
+    carregarAvisosGeral();
+  }catch(e){
+    Swal.fire('Erro', e.message, 'error');
+  }
+};
+
+async function editarAviso(id){
+  const d=await getDoc(doc(db,"avisos_geral",id));
+  if(d.exists()){
+    const av=d.data();
+    document.getElementById('aviso-id').value=d.id;
+    document.getElementById('aviso-inicio').value=av.inicio;
+    document.getElementById('aviso-fim').value=av.fim;
+    document.getElementById('aviso-msg').value=av.mensagem; // AQUI MOSTRA COMPLETO
+    document.getElementById('titulo-modal-aviso').innerText='Editar Aviso';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+}
+
+// ==== EXCLUIR COM CONFIRMAÇÃO E MENSAGEM ====
+async function excluirAviso(id){
+  const c=await Swal.fire({
+    title:'Excluir aviso',
+    text:'Deseja realmente excluir este aviso?',
+    icon:'warning',
+    showCancelButton:true,
+    confirmButtonText:'Sim, excluir',
+    cancelButtonText:'Cancelar',
+    confirmButtonColor:'#e74c3c'
+  });
+  if(!c.isConfirmed) return;
+  try{
+    await deleteDoc(doc(db,"avisos_geral",id));
+    await Swal.fire({icon:'success', title:'Excluído com sucesso!', timer:1500, showConfirmButton:false});
+    carregarAvisosGeral();
+  }catch(e){
+    Swal.fire('Erro', e.message, 'error');
+  }
+}
+
+document.getElementById('logout-button').onclick=async()=>{
+  const r=await Swal.fire({title:'Deseja Sair?',icon:'question',showCancelButton:true,confirmButtonText:'Sim,sair', cancelButtonText:'Cancelar'});
+  if(r.isConfirmed){signOut(auth).then(()=>{localStorage.clear();window.location.href='admin.html';});}
+};
+</script>
+</body>
+</html>
