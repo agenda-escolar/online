@@ -90,17 +90,22 @@ body{background:#d4f4e2;font-family:'Poppins',sans-serif;padding-bottom:90px}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs, limit, updateDoc, arrayUnion, Timestamp, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, limit, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 const firebaseConfig = { apiKey: "AIzaSyDJnKktnaupmHUwL-jZHIeionowOb6Egrg", authDomain: "agenda-escolar-19fda.firebaseapp.com", projectId: "agenda-escolar-19fda", storageBucket: "agenda-escolar-19fda.firebasestorage.app", messagingSenderId: "460998217684", appId: "1:460998217684:web:98e4a2cc23b467124bd041" };
-const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
 let dadosAlunoGlobal=null, cacheAgendas=[], provasGlobal=[], cacheTarefasSemana={};
+
 function formatarData(){return new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase())}
 function formatarDataFirebase(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function normalizarPaginas(t){if(!t) return '-';let txt=t.toString().trim();if(!txt) return '-';let p=txt.split(/[\s,;\-\/|]+/).map(s=>s.trim()).filter(Boolean);p=[...new Set(p)];return p.join(' • ')}
-function getSemanaISO(d){const dd=new Date(d+'T00:00:00');const jan4=new Date(dd.getFullYear(),0,4);const diff=(dd-jan4)/86400000;return `${dd.getFullYear()}-W${String(Math.ceil((diff+jan4.getDay()+1)/7)).padStart(2,'0')}`}
 function formatarDataCompleta(t){if(!t) return 'N/A';const d=t.toDate?t.toDate():new Date(t);return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',', ' às')}
 function formatarDataSimples(t){if(!t) return '';const d=t.toDate?t.toDate():new Date(t);return d.toLocaleDateString('pt-BR')}
 function isSim(v){ if(v===true) return true; if(typeof v==='string') return v.toLowerCase().includes('sim'); return false; }
+
 function formatarAssuntoProva(texto){
   if(!texto) return '<li>Nenhum assunto informado</li>';
   let linhas = texto.toString().split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
@@ -110,6 +115,7 @@ function formatarAssuntoProva(texto){
   if(linhas.length<=1) return `<li>${texto}</li>`;
   return linhas.map(l=>`<li>${l}</li>`).join('');
 }
+
 function getEstiloDisciplina(nome){
   const n = (nome||'').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
   if(n.includes('matematica')) return {cor:'#E3F2FD', corIconBg:'#BBDEFB', corIcon:'#1565C0', icon:'fa-calculator'};
@@ -123,13 +129,23 @@ function getEstiloDisciplina(nome){
   if(n.includes('ciencias')) return {cor:'#F1F8E9', corIconBg:'#DCEDC8', corIcon:'#33691E', icon:'fa-flask'};
   return {cor:'#E8EAF6', corIconBg:'#C5CAE9', corIcon:'#283593', icon:'fa-book'};
 }
-async function registrarAcessoAnalytics(t){try{if(sessionStorage.getItem('aluno_access_counted_this_session')==='true') return;const uid=auth.currentUser.uid;const user=auth.currentUser;const hoje=new Date();const dia=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;const mes=dia.substring(0,7);const ano=String(hoje.getFullYear());const semana=getSemanaISO(dia);await addDoc(collection(db,'analytics_access'),{userId:uid,email:user.email||'',nome:dadosAlunoGlobal?.nome||user.displayName||'',tipo_usuario:t,serie:dadosAlunoGlobal?.serie||'',turno:dadosAlunoGlobal?.turno||'',dia,mes,ano,semana,data:Timestamp.now(),createdAt:serverTimestamp()});sessionStorage.setItem('aluno_access_counted_this_session','true')}catch(e){}}
+
 document.getElementById('data-hoje').textContent=formatarData();
-window.logout=()=>{sessionStorage.removeItem('aluno_access_counted_this_session');signOut(auth).then(()=>{window.location.href='index.html'})};
+window.logout=()=>{signOut(auth).then(()=>{window.location.href='index.html'})};
 window.abrirProvas=()=>{document.getElementById('modal-provas').classList.add('ativo');carregarProvasDoCache()};
 window.fecharProvas=()=>{document.getElementById('modal-provas').classList.remove('ativo')};
 window.abrirAvisos=async()=>{document.getElementById('modal-avisos').classList.add('ativo');await carregarAvisosDoCache()};
 window.fecharAvisos=()=>{document.getElementById('modal-avisos').classList.remove('ativo')};
+
+function baixarBlob(doc,nome){
+  const blob=doc.output('blob');
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=nome; a.style.display='none';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},1500);
+}
+
 async function carregarTudoUnificado(serie, turno){
   const grid=document.getElementById('grid-tarefas');
   const barra=document.getElementById('barra-caderno-leitura');
@@ -163,29 +179,17 @@ async function carregarTudoUnificado(serie, turno){
       html+=`<div class="tf-card"><div class="tf-esq" style="background:${estilo.cor}"><div class="tf-esq-ic" style="background:${estilo.corIconBg};color:${estilo.corIcon}"><i class="fas ${estilo.icon}"></i></div><h3>${disc}</h3><span>DISCIPLINA</span></div><div class="tf-dir"><div class="tf-tit">Detalhes da Tarefa</div><div class="tf-item"><div class="tf-ic"><i class="far fa-file-lines"></i></div><div class="tf-tx"><label>LIVRO / PÁGINA</label><p>${pag}</p></div></div><div class="tf-item"><div class="tf-ic"><i class="fas fa-circle-info"></i></div><div class="tf-tx"><label>OBSERVAÇÃO</label><p>${obs}</p></div></div><div class="tf-item"><div class="tf-ic"><i class="far fa-user"></i></div><div class="tf-tx"><label>PROFESSOR</label><p>${prof}</p></div></div></div></div>`;
     });
     grid.innerHTML=html;
-
-    // *** UNICA LOGICA ALTERADA - CADERNO E IMPRESSA ***
     if(ehJardim){
       if(temLei || temImp){
         if(temLei){
           let u=[...new Set(paginas.join(' • ').split(' • ').map(s=>s.trim()).filter(Boolean))];
           txtCaderno.textContent=u.length?`Página ${u.join(' • ')}`:'Sim';
           boxCaderno.style.display='flex';
-        } else {
-          boxCaderno.style.display='none';
-        }
-        if(temImp){
-          boxImpressa.style.display='flex';
-        } else {
-          boxImpressa.style.display='none';
-        }
+        } else { boxCaderno.style.display='none'; }
+        if(temImp){ boxImpressa.style.display='flex'; } else { boxImpressa.style.display='none'; }
         barra.classList.add('show');
-      } else {
-        barra.classList.remove('show');
-      }
-    } else {
-      barra.classList.remove('show');
-    }
+      } else { barra.classList.remove('show'); }
+    } else { barra.classList.remove('show'); }
   }
   const qtdProvas=provasFuturas.filter(p=>(p.dataProva||'')>dataHoje).length;
   const dP=document.getElementById('alerta-prova-desktop'), mP=document.getElementById('alerta-prova-mobile');
@@ -195,6 +199,7 @@ async function carregarTudoUnificado(serie, turno){
   if(qtdAvisos>0){const t=qtdAvisos>9?'9+':qtdAvisos; dA.textContent=t; mA.textContent=t; dA.style.display='flex'; mA.style.display='flex';}else{dA.style.display='none'; mA.style.display='none';}
   cacheTarefasSemana={}; cacheAgendas.filter(a=>a.tipo==='tarefa').forEach(t=>{ if(!cacheTarefasSemana[t.data]) cacheTarefasSemana[t.data]=[]; cacheTarefasSemana[t.data].push(t);});
 }
+
 function carregarProvasDoCache(){
   const l=document.getElementById('lista-provas');
   if(provasGlobal.length===0){ l.innerHTML=`<div class="sem-tarefas">Nenhuma prova agendada!</div>`; return;}
@@ -203,8 +208,9 @@ function carregarProvasDoCache(){
     const estilo=getEstiloDisciplina(p.disciplina);
     const assuntoFormatado=formatarAssuntoProva(p.assunto||'');
     h+=`<div class="card-prova-new" style="border-left-color:${estilo.corIcon}"><div class="prova-data"><i class="fas fa-calendar-day"></i> ${df}</div><div class="prova-linha"><strong>Assunto da Prova:</strong> ${p.disciplina}</div><div class="prova-assunto-box"><div class="prova-assunto-titulo">Conteúdo:</div><ul class="prova-assunto-lista">${assuntoFormatado}</ul></div><div class="prova-linha"><strong>Professor:</strong> ${(p.nome_professor||'').replace(/^Prof\.?\s*/i,'')}</div></div>`;
-  });h+=`<button class="btn-pdf" onclick="gerarPDF()"><i class="fas fa-file-pdf"></i> Gerar PDF de Provas</button>`;l.innerHTML=h;
+  });h+=`<button type="button" class="btn-pdf" onclick="gerarPDF()"><i class="fas fa-file-pdf"></i> Gerar PDF de Provas</button>`;l.innerHTML=h;
 }
+
 async function carregarAvisosDoCache(){
   const lista=document.getElementById('lista-avisos');const uid=auth.currentUser.uid;
   const avisos=cacheAgendas.filter(a=>{ if(a.tipo!=='aviso') return false; if(!a.dataValidade) return true; const v=a.dataValidade.toDate?a.dataValidade.toDate():new Date(a.dataValidade.seconds*1000); return v>=new Date();});
@@ -218,181 +224,84 @@ async function carregarAvisosDoCache(){
     html+=`<div class="card-aviso-turma"><div class="aviso-header-top"><strong><i class="fas fa-bullhorn"></i> Aviso</strong><span class="aviso-publicado-pill"><i class="far fa-clock"></i> Publicado: ${pub}</span></div><div class="aviso-corpo-novo"><div class="aviso-data-linha">${txt}</div><div class="aviso-msg-box"><i class="fas fa-bars-staggered" style="margin-top:2px"></i><span>${(a.aviso||a.mensagem||'').toString()}</span></div><div class="aviso-prof-linha"><i class="fas fa-chalkboard-teacher"></i> Prof. ${prof}</div></div></div>`;
   });lista.innerHTML=html;for(const id of ids){ try{ await updateDoc(doc(db,'agendas',id),{lidos:arrayUnion(uid)}) }catch(e){}}
 }
+
 window.gerarPDF=()=>{
-  const{jsPDF}=window.jspdf;
-  const doc=new jsPDF('p','mm','a4');
-  const verdeEscuro=[22,74,47];
-  const verdeBarra=[107,155,107];
-  const verdeClaroTitulo=[212,232,208];
-  const verdeClaroFundo=[240,247,240];
-  const verdeBorda=[168,216,176];
-  function iconeCalendario(x,y){
-    doc.setDrawColor(255,255,255);doc.setLineWidth(0.35);
-    doc.setFillColor(255,255,255);
-    doc.roundedRect(x,y,5,5,0.7,0.7,'FD');
-    doc.setFillColor(...verdeBarra);
-    doc.rect(x,y,5,1.3,'F');
-    doc.setDrawColor(...verdeBarra);
-    doc.setLineWidth(0.2);
-    doc.line(x+1,y+2.2,x+1,y+4);doc.line(x+2.5,y+2.2,x+2.5,y+4);doc.line(x+4,y+2.2,x+4,y+4);
-  }
-  function iconeDoc(x,y){
-    doc.setDrawColor(255,255,255);doc.setLineWidth(0.35);
-    doc.setFillColor(255,255,255);
-    doc.roundedRect(x,y,4,5,0.5,0.5,'FD');
-    doc.setDrawColor(...verdeBarra);
-    doc.setLineWidth(0.25);
-    doc.line(x+0.8,y+1.5,x+3.2,y+1.5);doc.line(x+0.8,y+2.5,x+3.2,y+2.5);doc.line(x+0.8,y+3.5,x+3.2,y+3.5);
-  }
-  doc.setFillColor(...verdeEscuro);
-  doc.rect(0,0,210,28,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(11);doc.setFont('helvetica','bold');
-  doc.text('INSTITUTO EDUCACIONAL MARITO DUTRA',12,9);
-  doc.setFontSize(8);doc.setFont('helvetica','normal');
-  doc.setTextColor(200,230,200);
-  doc.text('Agenda Escolar Digital - 2026 - Avaliações',12,14);
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(10);doc.setFont('helvetica','bold');
-  doc.text((dadosAlunoGlobal?.nome||'ALUNO').toUpperCase(),12,20);
-  doc.setFontSize(8);doc.setFont('helvetica','normal');
-  doc.text(`${dadosAlunoGlobal?.serie||''} - ${dadosAlunoGlobal?.turno||''} | ${new Date().toLocaleDateString('pt-BR')}`,12,24);
-  doc.setFillColor(212,244,226);
-  doc.rect(0,28,210,4,'F');
-  if(provasGlobal.length===0){
-    doc.setTextColor(80,80,80);doc.setFontSize(11);
-    doc.text('Nenhuma prova agendada!',105,60,{align:'center'});
-    doc.save(`Provas_${dadosAlunoGlobal?.nome||'aluno'}.pdf`);
-    return;
-  }
-  let porData={};
-  provasGlobal.forEach(p=>{const k=p.dataProva||p.data;if(!porData[k]) porData[k]=[];porData[k].push(p)});
-  let y=38;
-  for(let dk of Object.keys(porData).sort()){
-    let lista=porData[dk];
-    let dt=new Date(dk+'T00:00:00');
-    let tit=`${dt.toLocaleDateString('pt-BR',{weekday:'long'}).toUpperCase()} - ${dt.toLocaleDateString('pt-BR')}`;
-    if(y>250){doc.addPage();y=15;}
-    doc.setFillColor(...verdeBarra);
-    doc.roundedRect(10,y,190,10,2.5,2.5,'F');
-    iconeCalendario(13,y+2.5);
-    doc.setTextColor(255,255,255);
-    doc.setFont('helvetica','bold');doc.setFontSize(8);
-    doc.text(`${tit}`,21,y+6.5);
-    iconeDoc(165,y+2.5);
-    doc.text(`${lista.length} avaliações`,171,y+6.5);
-    y+=15;
-    let xCol=0; let x=10;
-    const cardW=92; const cardH=32;
-    for(let p of lista){
-      if(xCol===0) x=10; else x=108;
-      if(y+cardH>285){
-        if(xCol===1){xCol=0;x=10;y+=cardH+4;}
-        if(y+cardH>285){doc.addPage();y=15;x=10;xCol=0;}
-      }
-      doc.setDrawColor(...verdeBorda);doc.setLineWidth(0.45);
-      doc.setFillColor(...verdeClaroFundo);
-      doc.roundedRect(x,y,cardW,cardH,3,3,'FD');
-      doc.setFillColor(...verdeClaroTitulo);
-      doc.roundedRect(x+1,y+1,cardW-2,8,2,2,'F');
-      doc.setTextColor(...verdeEscuro);
-      doc.setFont('helvetica','bold');doc.setFontSize(7.5);
-      let disc=(p.disciplina||'').toUpperCase().substring(0,26);
-      doc.text(disc,x+cardW/2,y+6,{align:'center'});
-      let assuntoX=x+2; let assuntoY=y+11.5; let assuntoW=19; let assuntoH=18;
-      doc.setFillColor(255,255,255);doc.setDrawColor(...verdeBorda);doc.setLineWidth(0.35);
-      doc.roundedRect(assuntoX,assuntoY,assuntoW,assuntoH,2.5,2.5,'FD');
-      doc.setTextColor(30,30,30);doc.setFont('helvetica','bold');doc.setFontSize(6.5);
-      doc.text('assunto',assuntoX+assuntoW/2,assuntoY+assuntoH/2+1,{align:'center'});
-      let conteudoX=assuntoX+assuntoW+2; let conteudoY=assuntoY;
-      let conteudoW=cardW-assuntoW-6;
-      doc.setFillColor(255,255,255);
-      doc.setDrawColor(...verdeBorda);
-      doc.roundedRect(conteudoX,conteudoY,conteudoW,18,2.5,2.5,'FD');
-      doc.setTextColor(20,20,20);doc.setFont('helvetica','normal');doc.setFontSize(6);
-      let linhas=doc.splitTextToSize((p.assunto||'').toString(),conteudoW-4);
-      if(linhas.length>3) linhas=linhas.slice(0,3);
-      doc.text(linhas,conteudoX+2,conteudoY+5);
-      if(xCol===0){xCol=1;}else{xCol=0;y+=cardH+4;}
+  try{
+    const{jsPDF}=window.jspdf; const doc=new jsPDF('p','mm','a4');
+    doc.setFillColor(22,74,47); doc.rect(0,0,210,28,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.text('INSTITUTO EDUCACIONAL MARITO DUTRA',12,9);
+    doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(200,230,200); doc.text('Agenda Escolar Digital - 2026 - Avaliações',12,14);
+    doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text((dadosAlunoGlobal?.nome||'ALUNO').toUpperCase(),12,20);
+    doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.text(`${dadosAlunoGlobal?.serie||''} - ${dadosAlunoGlobal?.turno||''} | ${new Date().toLocaleDateString('pt-BR')}`,12,24);
+    doc.setFillColor(212,244,226); doc.rect(0,28,210,4,'F');
+    if(provasGlobal.length===0){ doc.setTextColor(80,80,80); doc.setFontSize(11); doc.text('Nenhuma prova agendada!',105,60,{align:'center'}); baixarBlob(doc, `Provas_${dadosAlunoGlobal?.nome||'aluno'}.pdf`); return; }
+    let porData={}; provasGlobal.forEach(p=>{const k=p.dataProva||p.data;if(!porData[k]) porData[k]=[];porData[k].push(p)});
+    let y=38;
+    for(let dk of Object.keys(porData).sort()){
+      let lista=porData[dk]; let dt=new Date(dk+'T00:00:00'); let tit=`${dt.toLocaleDateString('pt-BR',{weekday:'long'}).toUpperCase()} - ${dt.toLocaleDateString('pt-BR')}`;
+      if(y>250){doc.addPage();y=15;}
+      doc.setFillColor(107,155,107); doc.roundedRect(10,y,190,10,2.5,2.5,'F');
+      doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.text(`${tit} - ${lista.length} avaliacoes`,15,y+6.5); y+=15;
+      for(let p of lista){
+        if(y+16>280){doc.addPage();y=15;}
+        doc.setDrawColor(168,216,176); doc.setFillColor(240,247,240); doc.roundedRect(10,y,190,14,2,2,'FD');
+        doc.setTextColor(22,74,47); doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.text((p.disciplina||'').toUpperCase(),12,y+5);
+        doc.setTextColor(20,20,20); doc.setFont('helvetica','normal'); doc.setFontSize(6); doc.text(doc.splitTextToSize((p.assunto||'').toString(),184).slice(0,2),12,y+10); y+=16;
+      } y+=4;
     }
-    if(xCol===1) y+=cardH+4;
-    y+=4;
-  }
-  doc.save(`Provas_${(dadosAlunoGlobal?.nome||'aluno').replace(/\s+/g,'_')}.pdf`);
+    baixarBlob(doc, `Provas_${(dadosAlunoGlobal?.nome||'aluno').replace(/\s+/g,'_')}.pdf`);
+  }catch(e){ alert('Erro PDF: '+e.message); }
 };
-window.gerarPDFTarefasSemana=async()=>{
-  const {jsPDF}=window.jspdf; const doc=new jsPDF('p','mm','a4');
-  doc.setFillColor(26,72,48);doc.rect(0,0,210,22,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('INSTITUTO EDUCACIONAL MARITO DUTRA',8,8);
-  doc.setFontSize(7);doc.setFont('helvetica','normal');doc.text('Agenda Escolar Digital - 2026',8,12);
-  doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text((dadosAlunoGlobal.nome||'').toUpperCase(),8,16);
-  doc.setFontSize(6.5);doc.setFont('helvetica','normal');doc.text(`${dadosAlunoGlobal.serie} - ${dadosAlunoGlobal.turno.toLowerCase()} | ${new Date().toLocaleDateString('pt-BR')}`,8,19);
-  doc.setFillColor(212,244,226);doc.rect(0,22,210,2,'F');
-  const hoje=new Date();const diaSem=hoje.getDay();const segunda=new Date(hoje);segunda.setDate(hoje.getDate()-diaSem+(diaSem===0?-6:1));
-  let tarefasPorDia={},dias=[];
-  for(let i=0;i<5;i++){ let d=new Date(segunda);d.setDate(segunda.getDate()+i); let ds=d.toISOString().split('T')[0]; let nome=['Domingo','Segunda-Feira','Terça-Feira','Quarta-Feira','Quinta-Feira','Sexta-Feira','Sábado'][d.getDay()]; let br=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}); let lista=cacheTarefasSemana[ds]||[]; if(lista.length>0){let k=`${nome} - ${br} - ${ds}`;tarefasPorDia[k]=lista;dias.push(k)}}
-  let y=28;
-  if(dias.length===0){ doc.setFillColor(255,255,255);doc.setDrawColor(180,210,180);doc.roundedRect(10,y,190,14,2,2,'FD');doc.setTextColor(100,100,100);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text('Nenhuma tarefa lançada para esta semana!',105,y+8,{align:'center'});doc.save(`PDF_Semana_${dadosAlunoGlobal.nome}.pdf`);return;}
-  for(let dk of dias){
-    if(y>230){doc.addPage();y=10;}
-    let p=dk.split(' - '); let nomeDia=p[0]; let dataBr=p[1]; let lista=tarefasPorDia[dk];
-    let pags=[]; let temLei=false, temImp=false;
-    lista.forEach(t=>{ if(isSim(t.cadernoLeitura)){ temLei=true; if(t.cadernoPaginas) pags.push(t.cadernoPaginas.toString().trim());} if(isSim(t.impressa)||isSim(t.tarefaImpressa)) temImp=true;});
-    let txtCaderno='Não'; if(temLei){ if(pags.length){ let u=[...new Set(pags.join(' • ').split(' • ').map(s=>s.trim()).filter(Boolean))]; txtCaderno=`Página ${u.join(' • ')}`;} else txtCaderno='Sim';}
-    let txtImp=temImp?'Sim':'Não';
-    let yInicio = y;
-    doc.setFillColor(107,125,140);doc.roundedRect(12,y,186,8,2,2,'F');
-    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.text(`${nomeDia.toUpperCase()} - ${dataBr}`,15,y+5.2);
-    doc.setFontSize(6);doc.setFont('helvetica','normal');doc.text(`${lista.length} tarefa(s)`,195,y+5.2,{align:'right'});y+=10;
-    const ehJardimPDF = (dadosAlunoGlobal.serie||'').toUpperCase().includes('JARDIM');
-    if(ehJardimPDF && (temLei || temImp)){
-      doc.setFillColor(255,255,255);doc.setDrawColor(100,100,100);doc.setLineWidth(0.25);doc.roundedRect(12,y,186,9,2,2,'FD');
-      doc.setFont('helvetica','bold');doc.setFontSize(6);doc.setTextColor(40,40,40);
-      if(temLei){
-        doc.text('CADERNO DE LEITURA',15,y+5.5);
-        let wC=doc.getTextWidth(txtCaderno)+6; doc.setFillColor(214,232,208);doc.setDrawColor(180,210,180);doc.roundedRect(46,y+1.5,wC,6,2,2,'FD');doc.setTextColor(26,61,40);doc.setFontSize(6);doc.text(txtCaderno,48,y+5.2);
-      }
-      if(temImp){
-        doc.setTextColor(40,40,40);doc.text('TAREFA IMPRESSA',140,y+5.5);
-        let wI=doc.getTextWidth('Sim')+6; let xI=194-wI;
-        doc.setFillColor(209,240,216);doc.setDrawColor(168,216,176);
-        doc.roundedRect(xI,y+1.5,wI,6,2,2,'FD');doc.setTextColor(22,101,52);doc.text('Sim',xI+3,y+5.2);
-      }
-      y+=14;
+
+window.gerarPDFTarefasSemana=()=>{
+  try{
+    const {jsPDF}=window.jspdf; const doc=new jsPDF('p','mm','a4');
+    doc.setFillColor(26,72,48);doc.rect(0,0,210,22,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('INSTITUTO EDUCACIONAL MARITO DUTRA',8,8);
+    doc.setFontSize(7);doc.setFont('helvetica','normal');doc.text('Agenda Escolar Digital - 2026',8,12);
+    doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text((dadosAlunoGlobal.nome||'').toUpperCase(),8,16);
+    doc.setFontSize(6.5);doc.setFont('helvetica','normal');doc.text(`${dadosAlunoGlobal.serie} - ${dadosAlunoGlobal.turno.toLowerCase()} | ${new Date().toLocaleDateString('pt-BR')}`,8,19);
+    doc.setFillColor(212,244,226);doc.rect(0,22,210,2,'F');
+    const hoje=new Date();const diaSem=hoje.getDay();const segunda=new Date(hoje);segunda.setDate(hoje.getDate()-diaSem+(diaSem===0?-6:1));
+    let tarefasPorDia={},dias=[];
+    for(let i=0;i<5;i++){ let d=new Date(segunda);d.setDate(segunda.getDate()+i); let ds=d.toISOString().split('T')[0]; let nome=['Domingo','Segunda-Feira','Terça-Feira','Quarta-Feira','Quinta-Feira','Sexta-Feira','Sábado'][d.getDay()]; let br=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}); let lista=cacheTarefasSemana[ds]||[]; if(lista.length>0){let k=`${nome} - ${br} - ${ds}`;tarefasPorDia[k]=lista;dias.push(k)}}
+    let y=28;
+    if(dias.length===0){ doc.setFillColor(255,255,255);doc.setDrawColor(180,210,180);doc.roundedRect(10,y,190,14,2,2,'FD');doc.setTextColor(100,100,100);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text('Nenhuma tarefa lançada para esta semana!',105,y+8,{align:'center'}); baixarBlob(doc, `PDF_Semana_${dadosAlunoGlobal.nome}.pdf`); return;}
+    for(let dk of dias){
+      if(y>230){doc.addPage();y=10;}
+      let p=dk.split(' - '); let nomeDia=p[0]; let dataBr=p[1]; let lista=tarefasPorDia[dk];
+      doc.setFillColor(107,125,140);doc.roundedRect(12,y,186,8,2,2,'F');
+      doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.text(`${nomeDia.toUpperCase()} - ${dataBr}`,15,y+5.2);
+      doc.setFontSize(6);doc.setFont('helvetica','normal');doc.text(`${lista.length} tarefa(s)`,195,y+5.2,{align:'right'});y+=12;
+      for(let t of lista){
+        if(y+18>280){doc.addPage();y=10;}
+        doc.setFillColor(255,255,255);doc.setDrawColor(200,210,200);doc.setLineWidth(0.2);doc.roundedRect(12,y,186,14,2,2,'FD');
+        doc.setFontSize(6.5);doc.setTextColor(40,40,80);doc.setFont('helvetica','bold');doc.text((t.disciplina||'DISCIPLINA').toUpperCase().substring(0,30),15,y+5);
+        doc.setFont('helvetica','normal');doc.setTextColor(50,50,50);doc.setFontSize(5.5);doc.text(`Livro: ${normalizarPaginas(t.livro||t.pagina||'-')} | Obs: ${(t.observacao||t.obs||'').substring(0,80)}`,15,y+10);
+        y+=18;
+      } y+=6;
     }
-    let cardsPos=[];
-    let yAtual = y;
-    let idx=0;
-    while(idx < lista.length){
-      let t1 = lista[idx];
-      let obs1 = (t1.observacao||t1.obs||'Sem observação').toString();
-      let linhas1 = doc.splitTextToSize(`Obs: ${obs1}`,86);
-      let alt1 = 24 + (linhas1.length*3.2);
-      let t2 = (idx+1 < lista.length)? lista[idx+1] : null;
-      let linhas2 = null, alt2 = 0;
-      if(t2){ let obs2=(t2.observacao||t2.obs||'Sem observação').toString(); linhas2=doc.splitTextToSize(`Obs: ${obs2}`,86); alt2=24+(linhas2.length*3.2); }
-      let altLinha = Math.max(alt1, alt2 || 0);
-      if(yAtual + altLinha > 275){ doc.addPage(); yAtual=10; yInicio=8; }
-      cardsPos.push({x:12, y:yAtual, alt:alt1, t:t1, linhas:linhas1});
-      if(t2) cardsPos.push({x:105, y:yAtual, alt:alt2, t:t2, linhas:linhas2});
-      yAtual += altLinha + 4;
-      idx+=2;
-    }
-    let yFimCards = yAtual;
-    for(let c of cardsPos){
-      doc.setFillColor(255,255,255);doc.setDrawColor(200,210,200);doc.setLineWidth(0.2);doc.roundedRect(c.x,c.y,91,c.alt,2,2,'FD');
-      doc.setFillColor(232,238,242);doc.roundedRect(c.x,c.y,91,7,2,2,'F');doc.rect(c.x,c.y+4,91,3,'F');
-      doc.setFontSize(6.5);doc.setTextColor(40,40,80);doc.setFont('helvetica','bold');doc.text((c.t.disciplina||'DISCIPLINA').toUpperCase().substring(0,24),c.x+3,c.y+4.8);
-      doc.setFont('helvetica','normal');doc.setTextColor(50,50,50);doc.setFontSize(5.5);doc.text(`Livro: ${normalizarPaginas(c.t.livro||c.t.pagina||'-')}`,c.x+3,c.y+10.5);doc.text(c.linhas,c.x+3,c.y+13.5);
-      let py=c.y+13.5+(c.linhas.length*3.1)+1;doc.setFontSize(5);doc.setTextColor(80,80,80);doc.text(`Prof: ${(c.t.professor||c.t.nome_professor||'-').substring(0,26)}`,c.x+3,py);
-    }
-    let alturaTotal = (yFimCards - yInicio) + 2;
-    doc.setDrawColor(200,230,180);doc.setLineWidth(0.4);doc.roundedRect(10,yInicio-2,190,alturaTotal+6,4,4,'D');
-    y=yFimCards+8;
-  }
-  doc.save(`PDF_Semana_${dadosAlunoGlobal.nome.replace(/\s+/g,'_')}.pdf`);
+    baixarBlob(doc, `PDF_Semana_${dadosAlunoGlobal.nome.replace(/\s+/g,'_')}.pdf`);
+  }catch(e){ alert('Erro PDF Semana: '+e.message); }
 };
-onAuthStateChanged(auth,async(user)=>{if(user){const s=await getDoc(doc(db,"alunos",user.uid));if(s.exists()){const d=s.data();dadosAlunoGlobal=d;document.getElementById('nome-aluno').textContent=d.nome.toUpperCase();document.getElementById('serie-turno').textContent=`${d.serie} - ${d.turno}`;document.getElementById('foto-aluno').src=d.foto||'./img/aluna.png';await carregarTudoUnificado(d.serie,d.turno);registrarAcessoAnalytics('aluno')}else{window.location.href='index.html'}}else{window.location.href='index.html'}});
+
+onAuthStateChanged(auth,async(user)=>{
+  if(user){
+    const s=await getDoc(doc(db,"alunos",user.uid));
+    if(s.exists()){
+      const d=s.data();
+      dadosAlunoGlobal=d;
+      document.getElementById('nome-aluno').textContent=d.nome.toUpperCase();
+      document.getElementById('serie-turno').textContent=`${d.serie} - ${d.turno}`;
+      document.getElementById('foto-aluno').src=d.foto||'./img/aluna.png';
+      await carregarTudoUnificado(d.serie,d.turno);
+    }else{
+      window.location.href='index.html'
+    }
+  }else{
+    window.location.href='index.html'
+  }
+});
 </script>
 </body>
 </html>
