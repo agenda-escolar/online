@@ -147,7 +147,7 @@
     <div class="msg-vazia" id="msg-vazia"><i class="fa-solid fa-chart-line"></i> Nenhum acesso visualizado.<br>Clique em Visualizar Acessos.</div>
   </div>
 
-  <div id="modal-aviso-geral"><div class="modal-conteudo"><button class="btn-fechar-x" id="btn-x-fechar">✕</button><h3 id="titulo-modal-aviso">Adicionar Aviso Geral</h3><input type="hidden" id="aviso-id"><label>Data Início</label><input type="date" id="aviso-inicio"><label>Data Fim</label><input type="date" id="aviso-fim"><label>Mensagem</label><textarea id="aviso-msg" rows="4" placeholder="Digite o aviso..."></textarea><div class="modal-botoes"><button class="btn-salvar" id="btn-salvar-aviso">Salvar</button><button class="btn-cancelar" id="btn-fechar-aviso">Fechar</button></div><div class="lista-avisos" id="lista-avisos-geral"></div></div></div>
+  <div id="modal-aviso-geral"><div class="modal-conteudo"><button class="btn-fechar-x" id="btn-x-fechar">✕</button><h3 id="titulo-modal-aviso">Adicionar Aviso Geral</h3><input type="hidden" id="aviso-id"><label>Data Início</label><input type="date" id="aviso-inicio"><label>Data Fim</label><input type="date" id="aviso-fim"><label>Mensagem</label><textarea id="aviso-msg" rows="4" placeholder="Digite o aviso..."></textarea><div class="modal-botoes"><button class="btn-salvar" id="btn-salvar-aviso">Salvar</button><button class="btn-cancelar" id="btn-fechar-aviso">Fechar</button></div><div class="lista-avisos" id="lista-avisos-geral"></div><div id="paginacao-avisos-geral" style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; background:#f1f8f1; padding:10px; border-radius:8px;"></div></div></div>
   <div id="modal-detalhes"><div class="modal-conteudo detalhes"><button class="btn-fechar-x" id="btn-x-detalhes">✕</button><h3 id="titulo-detalhes">Detalhes</h3><p id="subtitulo-detalhes" style="color:#666;font-size:13px;margin-top:5px"></p><div id="lista-detalhes"></div><div class="paginacao-detalhes" id="paginacao-detalhes"></div></div></div>
 
 <script type="module">
@@ -297,24 +297,62 @@ function limparForm(){
   document.getElementById('titulo-modal-aviso').innerText='Adicionar Aviso Geral';
 }
 
-// ==== LISTA COM TEXTO CORTADO ====
+// ==== LISTA COM TEXTO CORTADO + PAGINAÇÃO ====
+let avisosGeralCache = [];
+let paginaAvisoAtual = 1;
+const AVISOS_POR_PAGINA = 3;
+
 async function carregarAvisosGeral(){
   const lista=document.getElementById('lista-avisos-geral');
   lista.innerHTML='Carregando...';
   const snap=await getDocs(query(collection(db,"avisos_geral"),orderBy("inicio","desc")));
+  avisosGeralCache = [];
+  snap.forEach(d=> avisosGeralCache.push({id:d.id, ...d.data()}));
+  paginaAvisoAtual = 1;
+  renderAvisosPaginado();
+}
+
+function renderAvisosPaginado(){
+  const lista=document.getElementById('lista-avisos-geral');
+  const pagDiv=document.getElementById('paginacao-avisos-geral');
   lista.innerHTML='';
-  if(snap.empty){lista.innerHTML='<p style="text-align:center;color:#888">Nenhum aviso</p>';return;}
-  snap.forEach(d=>{
-    const av=d.data();
+  
+  if(avisosGeralCache.length === 0){
+    lista.innerHTML='<p style="text-align:center;color:#888">Nenhum aviso</p>';
+    pagDiv.innerHTML='';
+    return;
+  }
+
+  let totalPag = Math.ceil(avisosGeralCache.length / AVISOS_POR_PAGINA);
+  if(paginaAvisoAtual > totalPag) paginaAvisoAtual = totalPag;
+  if(paginaAvisoAtual < 1) paginaAvisoAtual = 1;
+
+  let inicio = (paginaAvisoAtual - 1) * AVISOS_POR_PAGINA;
+  let fim = inicio + AVISOS_POR_PAGINA;
+  let paginaItens = avisosGeralCache.slice(inicio, fim);
+
+  paginaItens.forEach(av=>{
     const textoCompleto = av.mensagem || '';
     const textoCurto = textoCompleto.length > 100 ? textoCompleto.substring(0,100) + '...' : textoCompleto;
     const div=document.createElement('div');
     div.className='item-aviso';
-    div.innerHTML=`<div style="flex:1; min-width:0;"><div style="font-size:11px;color:#036618;font-weight:bold">${av.inicio.split('-').reverse().join('/')} até ${av.fim.split('-').reverse().join('/')}</div><div style="font-size:14px; word-break:break-word;">${textoCurto}</div></div><div style="flex-shrink:0;"><button class="btn-editar" data-id="${d.id}">Editar</button><button class="btn-excluir" data-id="${d.id}">Excluir</button></div>`;
+    div.innerHTML=`<div style="flex:1; min-width:0;"><div style="font-size:11px;color:#036618;font-weight:bold">${av.inicio.split('-').reverse().join('/')} até ${av.fim.split('-').reverse().join('/')}</div><div style="font-size:14px; word-break:break-word;">${textoCurto}</div></div><div style="flex-shrink:0;"><button class="btn-editar" data-id="${av.id}">Editar</button><button class="btn-excluir" data-id="${av.id}">Excluir</button></div>`;
     lista.appendChild(div);
   });
+
   lista.querySelectorAll('.btn-editar').forEach(b=>b.onclick=()=>editarAviso(b.dataset.id));
   lista.querySelectorAll('.btn-excluir').forEach(b=>b.onclick=()=>excluirAviso(b.dataset.id));
+
+  pagDiv.innerHTML = `
+    <button onclick="mudarPaginaAviso(-1)" ${paginaAvisoAtual===1?'disabled':''} style="background:#036618;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
+    <span style="font-size:12px;font-weight:700;color:#036618">Página ${paginaAvisoAtual} de ${totalPag} - ${avisosGeralCache.length} avisos</span>
+    <button onclick="mudarPaginaAviso(1)" ${paginaAvisoAtual===totalPag?'disabled':''} style="background:#036618;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px">Próxima <i class="fa-solid fa-chevron-right"></i></button>
+  `;
+}
+
+window.mudarPaginaAviso = (dir) => {
+  paginaAvisoAtual += dir;
+  renderAvisosPaginado();
 }
 
 // ==== SALVAR COM MENSAGEM DE SUCESSO ====
@@ -343,13 +381,12 @@ async function editarAviso(id){
     document.getElementById('aviso-id').value=d.id;
     document.getElementById('aviso-inicio').value=av.inicio;
     document.getElementById('aviso-fim').value=av.fim;
-    document.getElementById('aviso-msg').value=av.mensagem; // AQUI MOSTRA COMPLETO
+    document.getElementById('aviso-msg').value=av.mensagem;
     document.getElementById('titulo-modal-aviso').innerText='Editar Aviso';
     window.scrollTo({top:0, behavior:'smooth'});
   }
 }
 
-// ==== EXCLUIR COM CONFIRMAÇÃO E MENSAGEM ====
 async function excluirAviso(id){
   const c=await Swal.fire({
     title:'Excluir aviso',
